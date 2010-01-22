@@ -74,15 +74,16 @@
 
 (mac page (user . body)
   `(whitepage 
-     (link "tips") (pr " - ") 
-     (link "add") (pr " - ")
-     (if ,user
-       (do
-         (pr "connected as " 
-           (if (admin ,user) "@" "") ,user)
-         (pr " - ")
-         (link "logout"))
-       (do (link "login") (pr " - ") (link "register")))
+     (w/bars
+       (link "tips")
+       (link "add")
+       (if ,user
+         (do
+           (pr "connected as " 
+             (if (admin ,user) "@" "") ,user
+             " ")
+           (link " (logout)" "logout"))
+         (w/bars (link "login") (link "register"))))
      (br)
      ,@body))
 
