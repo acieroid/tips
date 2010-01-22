@@ -1,6 +1,6 @@
 (= dir* "tips/")
-(unless maxid* (= maxid* 0))
-(unless tips* (= tips* (table)))
+(unless (bound 'maxid*) (= maxid* 0))
+(unless (bound 'tips*) (= tips* (table)))
 
 (deftem tip
   id nil
