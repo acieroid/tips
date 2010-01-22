@@ -159,14 +159,12 @@
         (prn "Bad id")))))
 
 (defop login-register req
+  (let greet (fn (user ip)
+               (page user (pr "Welcome, " user)))
   (page 
     (get-user req)
-    (login-form 
-      "Login" 'login login-handler
-      (fn (user ip) (page user (prs "Welcome, " user))))
-    (login-form 
-      "Create an account" 'register create-handler
-      (fn (user ip) (page user (prs "Welcome, " user))))))
+    (login-form  "Login" 'login login-handler greet)
+    (login-form  "Register" 'register create-handler greet))))
 
 (def tsv ((o port 8080))
   (ensure-dir dir*)
