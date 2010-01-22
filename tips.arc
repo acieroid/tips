@@ -41,15 +41,18 @@
   (rmfile (string dir* tip!id))
   (= (tips* tip!id) nil))
 
-(def show-tip (tip user)
-  (br2)
+(def show-tip-title (tip user)
   (tag b (pr (link tip!title (string "tips?id=" tip!id)) " "))
   (pr "by " tip!author " ")
   (when (or (is tip!author user) (admin user))
     (link "edit" (string "edit?id=" tip!id))
     (pr " - ")
     (link "delete" (string "del?id=" tip!id)))
-  (br)
+  (br))
+
+(def show-tip (tip user)
+  (br2)
+  (show-tip-title tip user)
   (pr tip!content)
   (br)
   (pr "tags: ")
@@ -62,6 +65,9 @@
 
 (def show-all-tips (user)
   (show-tips (fn (x) t) user))
+
+(def map-tips (fun)
+  (maptable (fn (k v) (fun v)) tips*))
 
 (def show-tag (tag)
   (link tag (string "tags?t=" tag)))
@@ -93,6 +99,10 @@
     (aif (tip (arg req "id"))
       (show-tip it (get-user req))
       (show-all-tips (get-user req)))))
+
+(defop tip-list req
+  (page (get-user req)
+    (map-tips (fn (t) (show-tip-title t (get-user req))))))
 
 (defopr || req (prn "tips"))
 
