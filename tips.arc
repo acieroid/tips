@@ -72,18 +72,25 @@
 (def show-tag (tag)
   (link tag (string "tags?t=" tag)))
 
+(def status-bar (user)
+ (w/bars
+   (link "tips")
+   (link "add")
+   (if user
+    (do
+      (pr "connected as " 
+        (if (admin user) "@" "") user
+        " ")
+      (w/link (do 
+                (logout-user user)
+                (page  nil
+                  (prn "Bye " user)))
+                 (pr " (logout)")))
+    (link "login or register" "login-register"))))
+
 (mac page (user . body)
   `(whitepage 
-     (w/bars
-       (link "tips")
-       (link "add")
-       (if ,user
-         (do
-           (pr "connected as " 
-             (if (admin ,user) "@" "") ,user
-             " ")
-           (link " (logout)" "logout"))
-         (w/bars (link "login") (link "register"))))
+     (status-bar ,user)
      (br)
      ,@body))
 
@@ -151,8 +158,15 @@
           (prn "You are not the author of this tip"))
         (prn "Bad id")))))
 
-(defop register req
-  (login-page 'register))
+(defop login-register req
+  (page 
+    (get-user req)
+    (login-form 
+      "Login" 'login login-handler
+      (fn (user ip) (page user (prs "Welcome, " user))))
+    (login-form 
+      "Create an account" 'register create-handler
+      (fn (user ip) (page user (prs "Welcome, " user))))))
 
 (def tsv ((o port 8080))
   (ensure-dir dir*)
