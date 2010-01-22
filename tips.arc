@@ -26,7 +26,7 @@
   (with (author (get-user req)
          title (arg req "title")
          content (arg req "content")
-         tags (split-str #\, (arg req "tags")))
+         tags (tokens (arg req "tags") #\,))
     (let newtip (inst 'tip 
                   'id (++ maxid*) 
                   'title title 
@@ -130,7 +130,7 @@
                                 t t))
                      (fn (name val) 
                        (if (is name 'tags)
-                         (= (it 'tags) (split-str #\, val)) 
+                         (= (it 'tags) (tokens val #\,)) 
                          (= (it name) val)))
                      (fn () (do 
                               (save-tip it)
@@ -153,14 +153,6 @@
 
 (defop register req
   (login-page 'register))
-
-(def split-str (sep str)
-  (when (> (len str) 0)
-    (aif (pos sep str)
-      (with (fst (cut str 0 it)
-             snd (cut str (+ it 1)))
-        (cons fst (split-str sep snd)))
-      (list str))))
 
 (def tsv ((o port 8080))
   (ensure-dir dir*)
