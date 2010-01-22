@@ -25,7 +25,7 @@
 (def add-tip (req)
   (with (author (get-user req)
          title (arg req "title")
-         content (arg req "content")
+         content (markdown (arg req "content"))
          tags (tokens (arg req "tags") #\,))
     (let newtip (inst 'tip 
                   'id (++ maxid*) 
@@ -129,7 +129,7 @@
         (if (or (admin user) (is it!author user))
           (vars-form user
                      `((string title ,it!title t t) 
-                       (text content ,it!content t t)
+                       (mdown content ,it!content t t)
                        (string tags 
                                ,(if (len> it!tags 1)
                                   (reduce (fn (x y) (string x "," y)) it!tags)
