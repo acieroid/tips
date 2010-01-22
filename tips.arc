@@ -129,7 +129,7 @@
         (if (or (admin user) (is it!author user))
           (vars-form user
                      `((string title ,it!title t t) 
-                       (mdown content ,it!content t t)
+                       (mdtext content ,it!content t t)
                        (string tags 
                                ,(if (len> it!tags 1)
                                   (reduce (fn (x y) (string x "," y)) it!tags)
