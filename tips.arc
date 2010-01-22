@@ -1,6 +1,8 @@
+(require "utils.arc")
 (= dir* "tips/")
 (unless (bound 'maxid*) (= maxid* 0))
 (unless (bound 'tips*) (= tips* (table)))
+(= title* "awesom's tips")
 
 (deftem tip
   id nil
@@ -42,23 +44,27 @@
   (= (tips* tip!id) nil))
 
 (def show-tip-title (tip user)
-  (tag b (pr (link tip!title (string "tips?id=" tip!id)) " "))
-  (pr "by " tip!author " ")
-  (when (or (is tip!author user) (admin user))
-    (link "edit" (string "edit?id=" tip!id))
-    (pr " - ")
-    (link "delete" (string "del?id=" tip!id)))
-  (br))
+  (spanclass tip-title 
+    (pr (link tip!title (string "tips?id=" tip!id)) " "))
+  (br)
+  (divclass tip-infos
+    (pr "by " tip!author " ")
+    (when (or (is tip!author user) (admin user))
+      (w/bars 
+        (link "edit" (string "edit?id=" tip!id))
+        (link "delete" (string "del?id=" tip!id))))
+    (br)))
 
 (def show-tip (tip user)
-  (show-tip-title tip user)
-  (pr tip!content)
-  (br)
-  (pr "tags: ")
-  (if (len> tip!tags 1)
-    (reduce (fn (x y) (show-tag x) (pr ", ") (show-tag y)) tip!tags)
-    (show-tag (car tip!tags))
-  (br)))
+  (divclass tip
+    (show-tip-title tip user)
+    (pr tip!content)
+    (br)
+    (pr "tags: ")
+    (if (len> tip!tags 1)
+        (reduce (fn (x y) (show-tag x) (pr ", ") (show-tag y)) tip!tags)
+        (show-tag (car tip!tags))
+        (br))))
 
 (def show-tips (pred user)
   (maptable (fn (k v) (when (pred v) (show-tip v user))) tips*))
@@ -73,23 +79,28 @@
   (link tag (string "tags?t=" tag)))
 
 (def status-bar (user)
- (w/bars
-   (link "tips")
-   (link "add")
-   (if user
-    (do
-      (pr "connected as " 
-        (if (admin user) "@" "") user
-        " ")
-      (w/link (do 
-                (logout-user user)
-                (page  nil
-                  (prn "Bye " user)))
-                 (pr " (logout)")))
-    (link "login or register" "login-register"))))
+  (tag (div class "statusbar")
+    (w/bars
+      (link "tips")
+      (link "add")
+      (if user
+          (do
+            (pr "connected as " 
+                (if (admin user) "@" "") user
+                " ")
+            (w/link (do 
+                      (logout-user user)
+                      (page  nil
+                             (prn "Bye " user)))
+                    (pr " (logout)")))
+          (link "login or register" "login-register")))))
 
 (mac page (user . body)
-  `(whitepage 
+  `(whitepage
+     (tag head
+       (prn "<link rel=\"stylesheet\" type=\"text/css\" href=\"tips.css\">")
+       (tag title (pr "tips@awesom")))
+     (tag h1 (pr title*))
      (status-bar ,user)
      (br)
      ,@body))
@@ -118,12 +129,10 @@
   (page (get-user req)
     (aif (arg req "t")
       (show-tips (fn (t) (find it t!tags)) (get-user req))
-      ;(maptable (fn (k v) (when (find it v!tags) (show-tip v (get-user req))))
-      ;  tips*)
-      (prn "No tag selected"))))
+      (prerr "No tag selected"))))
 
 (defopl edit req
-  (page  (get-user req)
+  (page (get-user req)
     (let user (get-user req)
       (aif (tip (arg req "id"))
         (if (or (admin user) (is it!author user))
@@ -141,30 +150,43 @@
                          (= (it name) val)))
                      (fn () (do 
                               (save-tip it)
-                              (page (get-user req) (prn "Tip modified"))))))
-        (prn "You are not the author of this tip")
-      (prn "Bad id")))))
+                              (page (get-user req) (prinfo "Tip modified"))))))
+        (prerr "You are not the author of this tip")
+      (prerr "Bad id")))))
 
 (defopl del req
   (page (get-user req)
     (let user (get-user req)
       (aif (tip (arg req "id"))
         (if (or (admin user) (is it!author user))
-          (do (prn "Are you sure?")
-              (w/link (do (delete-tip it)
-                          (page user (pr "Tip deleted!")))
-              (prn "Yes, delete this tip"))
-              (show-tip it user))
-          (prn "You are not the author of this tip"))
-        (prn "Bad id")))))
+          (do 
+            (if-confirm 
+              (delete-tip it)
+              (page user (prinfo "Tip deleted!")))
+            (show-tip it user))
+          (prerr "You are not the author of this tip"))
+        (prerr "Bad id")))))
 
 (defop login-register req
   (let greet (fn (user ip)
-               (page user (pr "Welcome, " user)))
-  (page 
-    (get-user req)
-    (login-form  "Login" 'login login-handler greet)
-    (login-form  "Register" 'register create-handler greet))))
+               (page user (prinfo "Welcome, " user)))
+    (page 
+      (get-user req)
+      (login-form  "Login" 'login login-handler greet)
+      (login-form  "Register" 'register create-handler greet))))
+
+(defop tips.css req
+  (pr "
+.error { color: #FF0000 }
+.info { }
+.statusbar { }
+.tip-title { font-size: 20px; margin-top: 10px }
+.tip-infos { margin-left: 10px }
+.tip { border: 1px dashed gray; padding: 5px }
+a { color: #003399; text-decoration: none }
+a:hover { color: blue; text-decoration: underline }
+body { font-family: Verdana, Sans-serif }
+"))
 
 (def tsv ((o port 8080))
   (ensure-dir dir*)
