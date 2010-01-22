@@ -1,6 +1,6 @@
-(= dir* "tips/"
-   maxid* 0
-   tips* (table))
+(= dir* "tips/")
+(unless maxid* (= maxid* 0))
+(unless tips* (= tips* (table)))
 
 (deftem tip
   id nil
@@ -51,14 +51,14 @@
   (br))
 
 (def show-tip (tip user)
-  (br2)
   (show-tip-title tip user)
   (pr tip!content)
   (br)
   (pr "tags: ")
   (if (len> tip!tags 1)
     (reduce (fn (x y) (show-tag x) (pr ", ") (show-tag y)) tip!tags)
-    (show-tag (car tip!tags))))
+    (show-tag (car tip!tags))
+  (br)))
 
 (def show-tips (pred user)
   (maptable (fn (k v) (when (pred v) (show-tip v user))) tips*))
