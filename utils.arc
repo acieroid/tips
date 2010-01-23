@@ -19,3 +19,6 @@
   `(divclass info
      (prn "Are you sure ?")
      (w/link (do ,@body) (pr "Yes"))))
+
+(def hr ()
+  (tag hr))

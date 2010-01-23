@@ -12,9 +12,11 @@
        (prn "<link rel=\"stylesheet\" type=\"text/css\" href=\"tips.css\">")
        (tag title (pr title*)))
      (tag h1 (pr title*))
-     (status-bar ,user)
+     (header ,user)
      (br)
-     ,@body))
+     ,@body
+     (hr)
+     (footer ,user)))
 
 ;;; define a new page, bind "user" variable
 (mac defpage (name req . body)
@@ -37,8 +39,8 @@
        ,@body
        (login-register-form))))
 
-(def status-bar (user)
-  (tag (div class "statusbar")
+(def header (user)
+  (tag (div class "header")
     (w/bars
       (link "tips")
       (link "add")
@@ -53,6 +55,11 @@
                              (prn "Bye " user)))
                     (pr " (logout)")))
           (link "login or register" "login")))))
+
+(def footer (user)
+  (tag (div class "footer")
+    (w/bars
+      (link "rss"))))
 
 (defpagel login req
   (prn "You're already logged in"))
@@ -113,12 +120,14 @@
   (pr "
 .error { color: #FF0000 }
 .info { }
-.statusbar { }
+.header { }
+.footer { text-align: center }
 .tip-title { font-size: 20px; margin-top: 10px }
 .tip-infos { margin-left: 10px }
 .tip { border: 1px dashed gray; padding: 5px }
 a { color: #003399; text-decoration: none }
 a:hover { color: blue; text-decoration: underline }
+hr { color: #AACCBB; size: 25 }
 body { font-family: Verdana, Sans-serif }
 "))
 
