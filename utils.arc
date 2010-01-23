@@ -3,10 +3,10 @@
   `(tag (div class (string ',class))
      ,@body))
 
-(def prerr (msg)
-  (divclass error (prn msg)))
-(def prinfo (msg)
-  (divclass info (prn msg)))
+(mac prerr msg
+  `(divclass error (prn ,@msg)))
+(mac prinfo msg
+  `(divclass info (prn ,@msg)))
 
 (mac y-or-n (q if-y if-n)
   `(divclass info
