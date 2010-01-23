@@ -1,5 +1,5 @@
 ;;;; tips.arc - Manage and show tips and tags
-(require "utils.arc")
+(load "utils.arc")
 
 ;;; Parameters
 (= dir* "tips/")

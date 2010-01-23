@@ -1,8 +1,10 @@
 ;;;; ui.arc - The user inteface (the pages)
-(require "tips.arc")
-(require "utils.arc")
+(load "tips.arc")
+(load "utils.arc")
 
-(= title* "awesom's tips")
+(= title* "awesom's tips"
+   url* "http://localhost:8080"
+   desc* "Some useful tips about programming and computers")
 
 (mac page (user . body)
   `(whitepage
@@ -120,6 +122,19 @@ a:hover { color: blue; text-decoration: underline }
 body { font-family: Verdana, Sans-serif }
 "))
 
+(defop rss req
+  (tag (rss version "2.0")
+    (tag channel
+      (tag title (pr title*))
+      (tag link (pr url*))
+      (tag description (pr desc*))
+      (map-tips (fn (tip)
+        (tag item
+           (tag title (pr tip!title))
+           (tag link (pr url* "/tips?id=" tip!id))
+           (tag description (cdata (pr tip!content)))))))))
+
+               
 ;;; The index
 (defopr || req (prn "tips"))
 
