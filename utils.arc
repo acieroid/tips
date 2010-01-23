@@ -1,4 +1,4 @@
-(attribute div class opstring)n
+(attribute div class opstring)
 (mac divclass (class . body)
   `(tag (div class (string ',class))
      ,@body))
