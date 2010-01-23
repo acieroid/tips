@@ -42,7 +42,8 @@
 (def header (user)
   (tag (div class "header")
     (w/bars
-      (link "tips")
+      (link "home" "tips")
+      (link "all")
       (link "add")
       (if user
           (do
@@ -76,7 +77,7 @@
     (show-tip it user)
     (show-all-tips user)))
 
-(defpage tip-list req
+(defpage all req
   (map-tips (fn (t) (show-tip-title t user))))
 
 (defpage tags req
@@ -120,7 +121,7 @@
   (pr "
 .error { color: #FF0000 }
 .info { }
-.header { }
+.header { text-align: center }
 .footer { text-align: center }
 .tip-title { font-size: 20px; margin-top: 10px }
 .tip-infos { margin-left: 10px }
