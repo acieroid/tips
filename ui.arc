@@ -1,6 +1,6 @@
 ;;;; ui.arc - The user inteface (the pages)
-(load "tips.arc")
-(load "utils.arc")
+(require "tips.arc")
+(require "utils.arc")
 
 (= title* "awesom's tips"
    url* "http://localhost:8080"
