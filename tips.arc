@@ -85,5 +85,5 @@
   (map-tips [show-tip _ user]))
 
 (def show-tag (tag)
-  (link tag (urlencode (string "tags?t=" tag))))
+  (link tag (string "tags?t=" (urlencode tag))))
 

@@ -93,7 +93,7 @@
 
 (defpage tags req
   (aif (arg req "t")
-    (show-tips (fn (t) (find (urldecode it) t!tags)) user)
+    (show-tips (fn (t) (find it t!tags)) user)
     (prerr "No tag selected")))
 
 (defpage edit req
