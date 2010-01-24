@@ -48,7 +48,7 @@
 
 (def show-tip-title (tip user)
   (spanclass tip-title 
-    (pr (link tip!title (string "tips?id=" tip!id)) " "))
+    (pr (link tip!title (string "tip?id=" tip!id)) " "))
   (br)
   (divclass tip-infos
     (pr "by " tip!author " ")

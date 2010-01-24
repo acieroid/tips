@@ -22,3 +22,9 @@
 
 (def hr ()
   (tag hr))
+
+;;; Same as for, but with start >= end
+(mac revfor (var start end . body)
+  `(for ,var ,end ,start
+     (let ,var (- ,start ,var )
+       ,@body)))

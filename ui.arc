@@ -4,7 +4,8 @@
 
 (= title* "awesom's tips"
    url* "http://localhost:8080"
-   desc* "Some useful tips about programming and computers")
+   desc* "Some useful tips about programming and computers"
+   perpage* 10)
 
 (mac page (user . body)
   `(whitepage
@@ -42,7 +43,7 @@
 (def header (user)
   (tag (div class "header")
     (w/bars
-      (link "home" "tips")
+      (link "home")
       (link "all")
       (link "add")
       (if user
@@ -72,10 +73,20 @@
          (row "tags:" (input "tags"))
          (row "" (submit)))))
 
-(defpage tips req
+(defpage tip req
   (aif (tip (arg req "id"))
     (show-tip it user)
-    (show-all-tips user)))
+    (prerr "Bad id")))
+
+(defpage home req
+  (loop (= id maxid*
+           n 0)
+        (and (> id 0)
+             (< n perpage*))
+    (-- id)
+    (awhen (tips* id)
+      (show-tip it user)
+      (++ n))))
 
 (defpage all req
   (map-tips (fn (t) (show-tip-title t user))))
@@ -141,12 +152,11 @@ body { font-family: Verdana, Sans-serif }
       (map-tips (fn (tip)
         (tag item
            (tag title (pr tip!title))
-           (tag link (pr url* "/tips?id=" tip!id))
+           (tag link (pr url* "/tip?id=" tip!id))
            (tag description (cdata (pr tip!content)))))))))
-
                
 ;;; The index
-(defopr || req (prn "tips"))
+(defopr || req (prn "home"))
 
 (def tsv ((o port 8080))
   (ensure-dir dir*)
