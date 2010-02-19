@@ -3,8 +3,10 @@
 
 ;;; Parameters
 (= dir* "tips/")
-(unless (bound 'maxid*) (= maxid* 0))
-(unless (bound 'tips*) (= tips* (table)))
+(defvar maxid* 0)
+(defvar tips* (table))
+(defvar ids* nil)
+(defvar tags* nil)
 
 (deftem tip
   id nil
@@ -17,11 +19,17 @@
 (def tip (id) 
   (tips* (errsafe:int id)))
 
+(def add-tags (tags)
+  (= tags* (union is tags tags*)))
+
 (def load-tips ()
   (each id-str (dir dir*)
     (let id (int id-str)
-      (= maxid* (max maxid* id)
-         (tips* id) (temload 'tip (string dir* id)))))
+      (let tip (temload 'tip (string dir* id))
+        (add-tags tip!tags)
+        (= maxid* (max maxid* id)
+           (tips* id) (temload 'tip (string dir* id))
+           ids* (cons tip!id ids*)))))
    tips*)
 
 (def save-tip (tip)
@@ -46,6 +54,9 @@
   (rmfile (string dir* tip!id))
   (= (tips* tip!id) nil))
 
+(def random-id ()
+  (rand-elt ids*))
+
 (def show-tip-title (tip user)
   (spanclass tip-title 
     (pr (link tip!title (string "tip?id=" tip!id)) " "))
@@ -58,16 +69,22 @@
         (link "delete" (string "del?id=" tip!id))))
     (br)))
 
+(def show-tag (tag)
+  (link tag (string "tag?t=" (urlencode tag))))
+
+(def show-tags (tags)
+  (if (len> tags 1)
+      (reduce (fn (x y) (show-tag x) (pr ", ") (show-tag y)) tags)
+      (show-tag (car tags))))
+
 (def show-tip (tip user)
   (divclass tip
     (show-tip-title tip user)
     (pr tip!content)
     (br)
     (pr "tags: ")
-    (if (len> tip!tags 1)
-        (reduce (fn (x y) (show-tag x) (pr ", ") (show-tag y)) tip!tags)
-        (show-tag (car tip!tags))
-        (br))))
+    (show-tags tip!tags)))
+
 
 ;;; Map a function through the tips that satisfies pred
 (def map-tips-if (pred fun)
@@ -83,7 +100,3 @@
 
 (def show-all-tips (user)
   (map-tips [show-tip _ user]))
-
-(def show-tag (tag)
-  (link tag (string "tags?t=" (urlencode tag))))
-

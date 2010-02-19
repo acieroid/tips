@@ -45,6 +45,8 @@
     (w/bars
       (link "home")
       (link "all")
+      (link "random")
+      (link "tags")
       (link "add")
       (if user
           (do
@@ -91,7 +93,13 @@
 (defpage all req
   (map-tips (fn (t) (show-tip-title t user))))
 
+(defpage random req
+  (show-tip (tips* (random-id)) user))
+
 (defpage tags req
+  (show-tags tags*))
+
+(defpage tag req
   (aif (arg req "t")
     (show-tips (fn (t) (find it t!tags)) user)
     (prerr "No tag selected")))

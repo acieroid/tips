@@ -28,3 +28,7 @@
   `(for ,var ,end ,start
      (let ,var (- ,start ,var )
        ,@body)))
+
+;;; Identical to the Common Lisp's defvar
+(mac defvar (var value)
+  `(unless (bound ',var) (= ,var ,value)))
