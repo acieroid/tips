@@ -28,7 +28,7 @@
       (let tip (temload 'tip (string dir* id))
         (add-tags tip!tags)
         (= maxid* (max maxid* id)
-           (tips* id) (temload 'tip (string dir* id))
+           (tips* id) tip
            ids* (cons tip!id ids*)))))
    tips*)
 
