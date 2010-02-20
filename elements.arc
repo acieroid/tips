@@ -51,8 +51,10 @@
   (save-element el))
 
 ;;; Delete a tip from the database and from the disk
+;;; TODO: delete the obsoletes tags
 (def delete-element (el)
   (rmfile (string dir* el!id))
+  (rem el!id ids*)
   (= (elements* el!id) nil))
 
 ;;; Return an random existing id
