@@ -1,16 +1,7 @@
 ;;;; bookmarks.arc -- A bookmark manager
-(require "ui.arc")
-(require "elements.arc")
+(require "basic.arc")
 
 (= title* "awesom's links")
-
-(def show-element-info (user el)
-  (divclass element-infos
-    (pr "by " el!author " ")
-    (when (or (is el!author user) (admin user))
-      (w/bars
-        (link "edit" (string "edit?id=" el!id))
-        (link "delete" (string "del?id=" el!id))))))
 
 (def show-element (user el)
   (divclass element
