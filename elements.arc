@@ -39,21 +39,16 @@
 (def save-element (el)
   (save-table el (string dir* el!id)))
 
-;;; Add an element to ELEMENTS* and save it to the hard-drive
-(def add-element (req)
-  (with (author (get-user req)
-         tags (tokens (arg req "tags") #\,)
-         datas (arg req "datas"))
-    (let new-el (inst 'element
-                 'id (++ maxid*)
-                 'author author
-                 'tags tags
-                 'date (date)
-                 'datas datas)
-      (add-tags new-el!tags)
-      (push new-el!id ids*)
-      (save-element new-el)
-      (= (elements* new-el!id) new-el))))
+;;; Add an ELEMENT to ELEMENTS* after having filled the date, the author and the
+;;; id tags, then save it to the hard-drive
+(def add-element (user el)
+  (= el!id (++ maxid*)
+     el!author user
+     el!date (date)
+     (elements* el!id) el)
+  (add-tags el!tags)
+  (push el!id ids*)
+  (save-element el))
 
 ;;; Delete a tip from the database and from the disk
 (def delete-element (el)
@@ -85,9 +80,9 @@
 ;;;; show-element should be defined (look at basic.arc)
 
 ;;; Show elements that matches PRED
-(def show-elements (pred user)
-  (map-elements-if pred [show-element _ user]))
+(def show-elements (user pred)
+  (map-elements-if pred [show-element user _]))
 
 ;;; Show all the elements
 (def show-all-elements (user)
-  (map-elements [show-element _ user)))
+  (map-elements [show-element user _)))

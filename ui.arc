@@ -66,11 +66,11 @@
   (prn "You're already logged in"))
 
 (defpagel add req
-  (show-element-form user))
+  (show-element-form user t))
 
 (defpage show req
   (aif (element (arg req "id"))
-    (show-element it user)
+    (show-element user it)
     (prerr "Bad id")))
 
 (defpage home req
@@ -80,28 +80,28 @@
              (< n perpage*))
     (-- id)
     (awhen (elements* id)
-      (show-element it user)
+      (show-element user it)
       (++ n))))
 
 ;;; Not really useful for generic elements, should be redefined to show a 
 ;;; shorter form of the element (eg. the title)
 (defpage all req
-  (map-elements (fn (t) (show-element t user))))
+  (map-elements (fn (el) (show-element user el))))
 
 (defpage random req
-  (show-element (elements* (random-id)) user))
+  (show-element user (elements* (random-id))))
 
 (defpage tags req
   (show-tags tags*))
 
 (defpage tag req
   (aif (arg req "t")
-    (show-elements (fn (el) (find it el!tags)) user)
+    (show-elements user (fn (el) (find it el!tags)))
     (prerr "No tag selected")))
 
 ;;; TODO
 (defpage edit req
-  (aif (tip (arg req "id"))
+  (aif (element (arg req "id"))
     (if (or (admin user) (is it!author user))
       (vars-form user
                  `((string title ,it!title t t) 
@@ -118,7 +118,8 @@
                  (fn () (do 
                           (save-tip it)
                           (page (get-user req) (prinfo "Tip modified"))))))
-    (prerr "You are not the author of this tip")
+
+    (prerr "You are not the author of this element")
     (prerr "Bad id")))
 
 (defpage del req
@@ -128,11 +129,10 @@
         (if-confirm 
           (delete-element it)
           (page user (prinfo "Element deleted!")))
-        (show-element it user))
+        (show-element user it))
       (prerr "You are not the author of this element"))
     (prerr "Bad id")))
 
-;;; TODO
 (defop css req
   (pr "
 .error { color: #FF0000 }
