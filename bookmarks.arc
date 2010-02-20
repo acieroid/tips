@@ -4,11 +4,14 @@
 (= title* "awesom's links")
 
 (def show-element (user el)
-  (divclass element
-    (link el!url)
-    (show-element-info user el)
-    (show-tags el!tags)))
+  (divclass link
+    (link el!description el!url)
+    (pr " in ")
+    (show-tags el!tags)
+    (pr " by " el!author " ")
+    (show-edit-and-delete user el)))
 
 (element-datas
-  `((string url ,element!url t t)
+  `((string description ,element!description t t)
+    (string url ,element!url t t)
     (toks tags ,element!tags t t)))

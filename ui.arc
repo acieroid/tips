@@ -117,19 +117,19 @@
       (prerr "You are not the author of this element"))
     (prerr "Bad id")))
 
-(defop css req
-  (pr "
-.error { color: #FF0000 }
+
+(= css* ".error { color: #FF0000 }
 .info { }
 .header { text-align: center }
 .footer { text-align: center }
-.element-infos { margin-left: 10px }
-.element { border: 1px dashed gray; padding: 5px }
 a { color: #003399; text-decoration: none }
 a:hover { color: blue; text-decoration: underline }
 hr { color: #AACCBB; size: 25 }
 body { font-family: Verdana, Sans-serif }
-"))
+")
+
+(defop css req
+  (pr css*))
 
 (defop rss req
   (tag (rss version "2.0")
