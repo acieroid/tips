@@ -99,7 +99,6 @@
     (show-elements user (fn (el) (find it el!tags)))
     (prerr "No tag selected")))
 
-;;; TODO
 (defpage edit req
   (aif (element (arg req "id"))
     (if (or (admin user) (is it!author user))
