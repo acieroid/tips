@@ -139,9 +139,8 @@
 .info { }
 .header { text-align: center }
 .footer { text-align: center }
-.tip-title { font-size: 20px; margin-top: 10px }
-.tip-infos { margin-left: 10px }
-.tip { border: 1px dashed gray; padding: 5px }
+.element-infos { margin-left: 10px }
+.element { border: 1px dashed gray; padding: 5px }
 a { color: #003399; text-decoration: none }
 a:hover { color: blue; text-decoration: underline }
 hr { color: #AACCBB; size: 25 }

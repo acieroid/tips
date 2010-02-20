@@ -81,8 +81,8 @@
   (map-elements-if (fn _ t) fun))
 
 
-;;; Showing lists of elements
-;;; show-element should be defined (look at basic.arc)
+;;;; Showing lists of elements
+;;;; show-element should be defined (look at basic.arc)
 
 ;;; Show elements that matches PRED
 (def show-elements (pred user)
