@@ -27,12 +27,12 @@
 ;;; Load all the elements from DIR*
 (def load-elements ()
   (each id-str (dir dir*)
-    (with (id (int id-str)
-           element (temload 'element (string dir* id)))
-      (add-tags element!tas)
+    (withs (id (int id-str)
+            element (temload 'element (string dir* id)))
+      (add-tags element!tags)
+      (push element!id ids*)
       (= maxid* (max maxid* id)
-         (element* id) element
-         ids* (cons element!id ids*))))
+         (elements* id) element)))
   elements*)
 
 ;;; Save an element to the disk
@@ -43,13 +43,15 @@
 (def add-element (req)
   (with (author (get-user req)
          tags (tokens (arg req "tags") #\,)
-         datas nil) ; TODO
+         datas (arg req "datas"))
     (let new-el (inst 'element
                  'id (++ maxid*)
                  'author author
                  'tags tags
                  'date (date)
                  'datas datas)
+      (add-tags new-el!tags)
+      (push new-el!id ids*)
       (save-element new-el)
       (= (elements* new-el!id) new-el))))
 
@@ -60,7 +62,7 @@
 
 ;;; Return an random existing id
 (def random-id ()
-  (random-elt ids*))
+  (rand-elt ids*))
 
 ;;; Show a tag
 (def show-tag (tag)
@@ -78,3 +80,15 @@
 
 (def map-elements (fun)
   (map-elements-if (fn _ t) fun))
+
+
+;;; Showing lists of elements
+;;; show-element should be defined (look at basic.arc)
+
+;;; Show elements that matches PRED
+(def show-elements (pred user)
+  (map-elements-if pred [show-element _ user]))
+
+;;; Show all the elements
+(def show-all-elements (user)
+  (map-elements [show-element _ user)))

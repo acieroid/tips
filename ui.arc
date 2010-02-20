@@ -1,16 +1,16 @@
 ;;;; ui.arc - The user inteface (the pages)
-(require "tips.arc")
+(require "elements.arc")
 (require "utils.arc")
 
-(= title* "awesom's tips"
+(= title* "undefined title"
    url* "http://localhost:8080"
-   desc* "Some useful tips about programming and computers"
+   desc* "undefined description"
    perpage* 10)
 
 (mac page (user . body)
   `(whitepage
      (tag head
-       (prn "<link rel=\"stylesheet\" type=\"text/css\" href=\"tips.css\">")
+       (prn "<link rel=\"stylesheet\" type=\"text/css\" href=\"css\">")
        (tag title (pr title*)))
      (tag h1 (pr title*))
      (header ,user)
@@ -69,15 +69,11 @@
   (prn "You're already logged in"))
 
 (defpagel add req
-  (aform [page user (add-tip _)]
-    (tab (row "title:" (input "title"))
-         (row "content:" (textarea "content" 10 80))
-         (row "tags:" (input "tags"))
-         (row "" (submit)))))
+  (show-element-form user))
 
-(defpage tip req
-  (aif (tip (arg req "id"))
-    (show-tip it user)
+(defpage show req
+  (aif (element (arg req "id"))
+    (show-element it user)
     (prerr "Bad id")))
 
 (defpage home req
@@ -86,24 +82,25 @@
         (and (> id 0)
              (< n perpage*))
     (-- id)
-    (awhen (tips* id)
-      (show-tip it user)
+    (awhen (elements* id)
+      (show-element it user)
       (++ n))))
 
 (defpage all req
-  (map-tips (fn (t) (show-tip-title t user))))
+  (map-elements (fn (t) (show-element t user))))
 
 (defpage random req
-  (show-tip (tips* (random-id)) user))
+  (show-element (elements* (random-id)) user))
 
 (defpage tags req
   (show-tags tags*))
 
 (defpage tag req
   (aif (arg req "t")
-    (show-tips (fn (t) (find it t!tags)) user)
+    (show-elements (fn (el) (find it el!tags)) user)
     (prerr "No tag selected")))
 
+;;; TODO
 (defpage edit req
   (aif (tip (arg req "id"))
     (if (or (admin user) (is it!author user))
@@ -126,17 +123,18 @@
     (prerr "Bad id")))
 
 (defpage del req
-  (aif (tip (arg req "id"))
+  (aif (element (arg req "id"))
     (if (or (admin user) (is it!author user))
       (do 
         (if-confirm 
-          (delete-tip it)
-          (page user (prinfo "Tip deleted!")))
-        (show-tip it user))
-      (prerr "You are not the author of this tip"))
+          (delete-element it)
+          (page user (prinfo "Element deleted!")))
+        (show-element it user))
+      (prerr "You are not the author of this element"))
     (prerr "Bad id")))
 
-(defop tips.css req
+;;; TODO
+(defop css req
   (pr "
 .error { color: #FF0000 }
 .info { }
@@ -160,13 +158,13 @@ body { font-family: Verdana, Sans-serif }
       (map-tips (fn (tip)
         (tag item
            (tag title (pr tip!title))
-           (tag link (pr url* "/tip?id=" tip!id))
+           (tag link (pr url* "/show?id=" tip!id))
            (tag description (cdata (pr tip!content)))))))))
                
 ;;; The index
 (defopr || req (prn "home"))
 
-(def tsv ((o port 8080))
+(def start ((o port 8080))
   (ensure-dir dir*)
-  (load-tips)
+  (load-elements)
   (thread (asv port)))
