@@ -4,12 +4,18 @@
 
 (= title* "awesom's tips")
 
-(def show-element (user el)
+(def show-title (user el)
   (link el!title (string "show?id=" el!id))
   (br)
-  (show-element-info user el)
+  (show-element-info user el))
+
+(def show-element (user el)
+  (show-title user el)
   (pr el!content)
   (show-tags el!tags))
+
+(defpage all req
+  (map-elements (fn (el) (show-title user el))))
 
 (element-datas
   `((string title ,element!title t t)
