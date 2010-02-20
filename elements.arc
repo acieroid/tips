@@ -27,7 +27,7 @@
 (def load-elements ()
   (each id-str (dir dir*)
     (withs (id (int id-str)
-            element (temload 'element (string dir* id)))
+            element (load-table (string dir* id)))
       (add-tags element!tags)
       (push element!id ids*)
       (= maxid* (max maxid* id)

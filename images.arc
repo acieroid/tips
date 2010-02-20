@@ -1,7 +1,7 @@
 ;;;; images.arc -- An image viewer (fukung-like)
 (require "basic.arc")
 (= title* "images")
-(= header-links* '("random" "tags" "add"))«
+(= header-links* '("random" "tags" "add"))
 
 (defopr || _ (prn "random"))
 
