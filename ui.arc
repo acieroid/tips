@@ -1,16 +1,17 @@
 ;;;; ui.arc - The user inteface (the pages)
-(require "tips.arc")
+(require "elements.arc")
 (require "utils.arc")
 
-(= title* "awesom's tips"
+(= title* "undefined title"
    url* "http://localhost:8080"
-   desc* "Some useful tips about programming and computers"
-   perpage* 10)
+   desc* "undefined description"
+   perpage* 10
+   header-links* '("home" "all" "random" "tags" "add"))
 
 (mac page (user . body)
   `(whitepage
      (tag head
-       (prn "<link rel=\"stylesheet\" type=\"text/css\" href=\"tips.css\">")
+       (prn "<link rel=\"stylesheet\" type=\"text/css\" href=\"css\">")
        (tag title (pr title*)))
      (tag h1 (pr title*))
      (header ,user)
@@ -43,11 +44,7 @@
 (def header (user)
   (tag (div class "header")
     (w/bars
-      (link "home")
-      (link "all")
-      (link "random")
-      (link "tags")
-      (link "add")
+      (map-w/bars header-links* link)
       (if user
           (do
             (pr "connected as " 
@@ -69,15 +66,11 @@
   (prn "You're already logged in"))
 
 (defpagel add req
-  (aform [page user (add-tip _)]
-    (tab (row "title:" (input "title"))
-         (row "content:" (textarea "content" 10 80))
-         (row "tags:" (input "tags"))
-         (row "" (submit)))))
+  (show-element-form user t))
 
-(defpage tip req
-  (aif (tip (arg req "id"))
-    (show-tip it user)
+(defpage show req
+  (aif (element (arg req "id"))
+    (show-element user it)
     (prerr "Bad id")))
 
 (defpage home req
@@ -86,65 +79,52 @@
         (and (> id 0)
              (< n perpage*))
     (-- id)
-    (awhen (tips* id)
-      (show-tip it user)
+    (awhen (elements* id)
+      (show-element user it)
       (++ n))))
 
+;;; Not really useful for generic elements, should be redefined to show a 
+;;; shorter form of the element (eg. the title)
 (defpage all req
-  (map-tips (fn (t) (show-tip-title t user))))
+  (map-elements (fn (el) (show-element user el))))
 
 (defpage random req
-  (show-tip (tips* (random-id)) user))
+  (show-element user (elements* (random-id))))
 
 (defpage tags req
   (show-tags tags*))
 
 (defpage tag req
   (aif (arg req "t")
-    (show-tips (fn (t) (find it t!tags)) user)
+    (show-elements user (fn (el) (find it el!tags)))
     (prerr "No tag selected")))
 
 (defpage edit req
-  (aif (tip (arg req "id"))
+  (aif (element (arg req "id"))
     (if (or (admin user) (is it!author user))
-      (vars-form user
-                 `((string title ,it!title t t) 
-                   (mdtext content ,it!content t t)
-                   (string tags 
-                           ,(if (len> it!tags 1)
-                              (reduce (fn (x y) (string x "," y)) it!tags)
-                              (car it!tags))
-                           t t))
-                 (fn (name val) 
-                   (if (is name 'tags)
-                       (= (it 'tags) (tokens val #\,)) 
-                       (= (it name) val)))
-                 (fn () (do 
-                          (save-tip it)
-                          (page (get-user req) (prinfo "Tip modified"))))))
-    (prerr "You are not the author of this tip")
+        (show-element-form user nil it)
+        (prerr "You are not the author of this element"))
     (prerr "Bad id")))
 
 (defpage del req
-  (aif (tip (arg req "id"))
+  (aif (element (arg req "id"))
     (if (or (admin user) (is it!author user))
       (do 
         (if-confirm 
-          (delete-tip it)
-          (page user (prinfo "Tip deleted!")))
-        (show-tip it user))
-      (prerr "You are not the author of this tip"))
+          (delete-element it)
+          (page user (prinfo "Element deleted!")))
+        (show-element user it))
+      (prerr "You are not the author of this element"))
     (prerr "Bad id")))
 
-(defop tips.css req
+(defop css req
   (pr "
 .error { color: #FF0000 }
 .info { }
 .header { text-align: center }
 .footer { text-align: center }
-.tip-title { font-size: 20px; margin-top: 10px }
-.tip-infos { margin-left: 10px }
-.tip { border: 1px dashed gray; padding: 5px }
+.element-infos { margin-left: 10px }
+.element { border: 1px dashed gray; padding: 5px }
 a { color: #003399; text-decoration: none }
 a:hover { color: blue; text-decoration: underline }
 hr { color: #AACCBB; size: 25 }
@@ -160,13 +140,13 @@ body { font-family: Verdana, Sans-serif }
       (map-tips (fn (tip)
         (tag item
            (tag title (pr tip!title))
-           (tag link (pr url* "/tip?id=" tip!id))
+           (tag link (pr url* "/show?id=" tip!id))
            (tag description (cdata (pr tip!content)))))))))
                
 ;;; The index
 (defopr || req (prn "home"))
 
-(def tsv ((o port 8080))
+(def start ((o port 8080))
   (ensure-dir dir*)
-  (load-tips)
+  (load-elements)
   (thread (asv port)))
