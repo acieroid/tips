@@ -70,9 +70,8 @@
 
 ;;; Show a list of tags
 (def show-tags (tags (o separator ", "))
-  (if (cdr tags)
-      (reduce (fn (x y) (show-tag x) (pr separator) (show-tag y)) tags)
-      (show-tag (car tags))))
+  (let bar* separator 
+    (map-w/bars tags show-tag)))
 
 ;;; Mapping functions over elements
 (def map-elements-if (pred fun)

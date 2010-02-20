@@ -5,7 +5,8 @@
 (= title* "undefined title"
    url* "http://localhost:8080"
    desc* "undefined description"
-   perpage* 10)
+   perpage* 10
+   header-links* '("home" "all" "random" "tags" "add"))
 
 (mac page (user . body)
   `(whitepage
@@ -43,11 +44,7 @@
 (def header (user)
   (tag (div class "header")
     (w/bars
-      (link "home")
-      (link "all")
-      (link "random")
-      (link "tags")
-      (link "add")
+      (map-w/bars header-links* link)
       (if user
           (do
             (pr "connected as " 
@@ -86,6 +83,8 @@
       (show-element it user)
       (++ n))))
 
+;;; Not really useful for generic elements, should be redefined to show a 
+;;; shorter form of the element (eg. the title)
 (defpage all req
   (map-elements (fn (t) (show-element t user))))
 

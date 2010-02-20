@@ -32,3 +32,10 @@
 ;;; Identical to the Common Lisp's defvar
 (mac defvar (var value)
   `(unless (bound ',var) (= ,var ,value)))
+
+;;; map FUN through LIST and print a bar between each element
+;;; (FUN should print something)
+(mac map-w/bars (list fun)
+  `(if (cdr ,list)
+       (reduce (fn (x y) (,fun x) (pr bar*) (,fun y)) ,list)
+       (,fun (car ,list))))
