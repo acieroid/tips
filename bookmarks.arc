@@ -14,14 +14,14 @@
 
 (def show-element (user el)
   (divclass element
-    (link el!datas)
+    (link el!url)
     (show-element-info user el)
     (show-tags el!tags)))
 
 (def show-element-form (user add (o element (table)))
   (vars-form user
-             '((url datas "" t t "URL:")
-               (toks tags nil t t "tags:"))
+             `((string url ,element!url t t)
+               (toks tags ,element!tags t t))
              (fn (name val) (= (element name) val))
              (fn () 
                (do

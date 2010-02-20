@@ -103,23 +103,8 @@
 (defpage edit req
   (aif (element (arg req "id"))
     (if (or (admin user) (is it!author user))
-      (vars-form user
-                 `((string title ,it!title t t) 
-                   (mdtext content ,it!content t t)
-                   (string tags 
-                           ,(if (len> it!tags 1)
-                              (reduce (fn (x y) (string x "," y)) it!tags)
-                              (car it!tags))
-                           t t))
-                 (fn (name val) 
-                   (if (is name 'tags)
-                       (= (it 'tags) (tokens val #\,)) 
-                       (= (it name) val)))
-                 (fn () (do 
-                          (save-tip it)
-                          (page (get-user req) (prinfo "Tip modified"))))))
-
-    (prerr "You are not the author of this element")
+        (show-element-form user nil it)
+        (prerr "You are not the author of this element"))
     (prerr "Bad id")))
 
 (defpage del req

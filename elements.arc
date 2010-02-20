@@ -13,8 +13,7 @@
   id nil
   author nil
   tags nil
-  date nil
-  datas nil)
+  date nil)
 
 ;;; Return the element with this id, or else nil
 (def element (id)
@@ -77,7 +76,6 @@
 (def map-elements (fun)
   (map-elements-if (fn _ t) fun))
 
-
 ;;;; Showing lists of elements
 ;;;; show-element should be defined (look at basic.arc)
 
@@ -87,4 +85,4 @@
 
 ;;; Show all the elements
 (def show-all-elements (user)
-  (map-elements [show-element user _)))
+  (map-elements [show-element user _]))
