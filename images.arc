@@ -7,7 +7,10 @@
 
 (def show-element (user el)
   (center
-    (link (string "<image src=\"" el!url "\"/>") "random")))
+    (link (string "<image src=\"" el!url "\"/>") "random")
+    (br)
+    (show-tags el!tags)
+    (show-element-info user el)))
 
 (element-datas
   `((string url ,element!url t t)
