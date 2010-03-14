@@ -12,7 +12,7 @@
 (def show-element-info (user el)
   (divclass element-infos
     (pr "by " el!author " ")
-    (show-edit-and-delete)))
+    (show-edit-and-delete user el)))
 
 (mac element-datas (datas)
   `(def show-element-form (user add (o element (table)))

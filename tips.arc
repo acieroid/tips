@@ -1,6 +1,7 @@
 ;;;; tips.arc -- A tip manager
 (require "ui.arc")
 (require "elements.arc")
+(require "basic.arc")
 
 (= title* "awesom's tips")
 
