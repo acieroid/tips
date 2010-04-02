@@ -39,3 +39,22 @@
   `(if (cdr ,list)
        (reduce (fn (x y) (,fun x) (pr bar*) (,fun y)) ,list)
        (,fun (car ,list))))
+
+;;;; Date manipulation
+
+(= month-string '("Jan" "Feb" "Mar" "Apr" "May" "Jun" 
+                  "Jul" "Aug" "Sep" "Oct" "Nov" "Dec"))
+(def day-suffix (n)
+  (case (mod n 10)
+    1 "st"
+    2 "nd"
+    3 "rd"
+      "th"))
+    
+;;; Convert a date returned by DATE to a string
+(def format-date (date)
+  (with (year (car date)
+         month (cadr date)
+         day (car (cddr date)))
+    (string (month-string (- month 1)) " " day (day-suffix day) " " year)))
+

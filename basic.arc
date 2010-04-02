@@ -11,7 +11,7 @@
 
 (def show-element-info (user el)
   (divclass element-infos
-    (pr "by " el!author " ")
+    (prn "by " el!author " on " (format-date el!date))
     (show-edit-and-delete user el)))
 
 (mac element-datas (datas)
