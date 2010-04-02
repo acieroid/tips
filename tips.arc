@@ -25,5 +25,5 @@
 
 (element-datas
   `((string title ,element!title t t)
-    (text tip ,element!tip t t)
+    (mdtext tip ,element!tip t t)
     (toks tags ,element!tags t t)))
