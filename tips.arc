@@ -16,7 +16,8 @@
 (def show-element (user el)
   (divclass element
             (show-title user el)
-            (pr el!content)
+            (prn el!tip)
+            (br)
             (show-tags el!tags)))
 
 (defpage all req
