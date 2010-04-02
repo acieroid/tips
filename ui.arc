@@ -131,17 +131,19 @@ body { font-family: Verdana, Sans-serif }
 (defop css req
   (pr css*))
 
+;;; FIXME: This only works for tips.arc
+;;; TODO: sort by date and print it
 (defop rss req
   (tag (rss version "2.0")
     (tag channel
       (tag title (pr title*))
       (tag link (pr url*))
       (tag description (pr desc*))
-      (map-tips (fn (tip)
+      (map-elements (fn (tip)
         (tag item
            (tag title (pr tip!title))
            (tag link (pr url* "/show?id=" tip!id))
-           (tag description (cdata (pr tip!content)))))))))
+           (tag description (cdata (pr tip!tip)))))))))
                
 ;;; The index
 (defopr || req (prn "home"))
