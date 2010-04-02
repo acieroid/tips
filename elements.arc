@@ -19,9 +19,19 @@
 (def element (id)
   (elements* (errsafe:int id)))
 
+;;; Increase the counter of the tag in TAGS, or add one initialized to 1
+(def add-tag (tag (o acc tags*))
+  (if acc
+      ; already in tags*, we increment it
+      (if (is (caar acc) tag)
+          (= (cdr (car acc)) (inc (cdr (car acc))))
+          (add-tag tag (cdr acc)))
+      ; not in tags*, we add it
+      (push (cons tag 1) tags* )))
+
 ;;; Add the tags that are in TAGS but not in TAGS* to TAGS*
 (def add-tags (tags)
-  (= tags* (union is tags tags*)))
+  (map add-tag tags))
 
 ;;; Load all the elements from DIR*
 (def load-elements ()
@@ -62,7 +72,10 @@
 
 ;;; Show a tag
 (def show-tag (tag)
-  (link tag (string "tag?t=" (urlencode tag))))
+  (let tag (if (is (type tag) 'cons)
+               (car tag)
+               tag)
+  (link tag (string "tag?t=" (urlencode tag)))))
 
 ;;; Show a list of tags
 (def show-tags (tags (o separator ", "))
