@@ -79,7 +79,7 @@
 (def delete-element (el)
   (del-tags el!tags)
   (rmfile (string dir* el!id))
-  (rem el!id ids*)
+  (= ids* (rem el!id ids*))
   (= (elements* el!id) nil))
 
 ;;; Return an random existing id
