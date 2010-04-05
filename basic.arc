@@ -18,7 +18,11 @@
   `(def show-element-form (user add (o element (table)))
      (vars-form user
                 ,datas
-                (fn (name val) (= (element name) val))
+                (fn (name val) 
+                  (when (is name 'tags)
+                    (del-tags element!tags)
+                    (add-tags val))
+                  (= (element name) val))
                 (fn ()
                   (do
                     (if add

@@ -27,11 +27,26 @@
           (= (cdr (car acc)) (inc (cdr (car acc))))
           (add-tag tag (cdr acc)))
       ; not in tags*, we add it
-      (push (cons tag 1) tags* )))
+      (push (cons tag 1) tags*)))
 
-;;; Add the tags that are in TAGS but not in TAGS* to TAGS*
+;;; Decrease the counter of the tag in TAGS, or delete the tag
+(def del-tag (tag)
+  (= tags* (keep (fn (x) x) ; delete all the nil elements
+                 (map 
+                   (fn (x)
+                     (if (is (car x) tag)
+                         (if (is (cdr x) 1)
+                             nil
+                             (cons tag (- (cdr x) 1)))
+                         x))
+                   tags*))))
+
+;;; Add (resp. delete) the tags that are in TAGS but not 
+;;; (resp. and) in TAGS* to (resp. from) TAGS*
 (def add-tags (tags)
   (map add-tag tags))
+(def del-tags (tags)
+  (map del-tag tags))
 
 ;;; Load all the elements from DIR*
 (def load-elements ()
@@ -62,6 +77,7 @@
 ;;; Delete a tip from the database and from the disk
 ;;; TODO: delete the obsoletes tags
 (def delete-element (el)
+  (delete-tags el!tags)
   (rmfile (string dir* el!id))
   (rem el!id ids*)
   (= (elements* el!id) nil))
