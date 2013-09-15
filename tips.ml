@@ -1,8 +1,8 @@
-open Eliom_parameter
 open Eliom_content.Html5.D
+open Eliom_parameter
 
 (* TODO:
-  - Tips.display (tips list)
+   - create database schema if db doesn't exist yet
 *)
 
 let menu () =
@@ -41,9 +41,30 @@ let page f a b =
               content;
               footer]))
 
+let string_of_timestamp t = "TODO"
+
+let display tips =
+  let display_tip tip =
+    div ~a:[a_class ["element"]] [
+    a ~service:Services.show_tip_service [pcdata tip.Data.title] tip.Data.id;
+    br ();
+    div ~a:[a_class ["element-infos"]]
+      [pcdata ("by " ^ tip.Data.author.Data.name ^ " on " ^
+               (string_of_timestamp  tip.Data.timestamp))];
+    (* TODO: Md.to_html *)
+    pcdata tip.Data.content;
+    br ();
+    p ~a:[a_class ["tags"]]
+      (List.map (fun tag ->
+        a ~service:Services.show_tag_service [pcdata tag] tag) tip.Data.tags);
+  ]
+  in
+  div ~a:[a_class ["elements"]]
+    (List.map display_tip tips)
+
+
 let home_body _ _ =
-  Lwt.return (p [pcdata "TODO: display tips"])
-  (* Tips.display (Database.get_n_most_recent_tips 5) *)
+  Lwt.return (display (Data.get_n_most_recent_tips 5))
 
 let todo_body _ _ =
   Lwt.return
@@ -64,6 +85,12 @@ let _ =
       ~service:service
       (page f)
   ) services;
+  Eliom_registration.Html5.register
+    ~service:Services.show_tip_service
+    (page todo_body);
+  Eliom_registration.Html5.register
+    ~service:Services.show_tag_service
+    (page todo_body);
   (* Users *)
   Eliom_registration.Html5.register ~service:Services.register_service
     (page Users.register_body);
