@@ -24,18 +24,5 @@ let login_service =
 let register_service =
   Eliom_service.service ~path:["register"] ~get_params:unit ()
 
-(*
-let login_confirm_service =
-  Eliom_service.post_service
-    ~fallback:main_service
-    ~post_params:(string "username" ** string "password")
-    ()
-*)
-let register_confirm_service =
-  Eliom_service.post_service
-    ~fallback:main_service
-    ~post_params:(string "username" ** string "password1" ** string "password2")
-    ()
-
 let logout_service =
   Eliom_service.post_coservice' ~post_params:unit ()

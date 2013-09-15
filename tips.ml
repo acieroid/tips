@@ -28,13 +28,6 @@ let footer =
      (* pcdata " - " *)
      (* TODO: link to source code *)]
 
-let home_body _ _ =
-  Lwt.return (p [pcdata "TODO: display tips"])
-  (* Tips.display (Database.get_n_most_recent_tips 5) *)
-
-let todo_body _ _ =
-  Lwt.return
-    (p [pcdata "TODO"])
 
 let page f a b =
   lwt menu = menu () in
@@ -46,6 +39,14 @@ let page f a b =
               content;
               footer]))
 
+let home_body _ _ =
+  Lwt.return (p [pcdata "TODO: display tips"])
+  (* Tips.display (Database.get_n_most_recent_tips 5) *)
+
+let todo_body _ _ =
+  Lwt.return
+    (p [pcdata "TODO"])
+
 let services = [
   (Services.main_service, home_body);
   (Services.all_service, todo_body);
@@ -53,8 +54,6 @@ let services = [
   (Services.tags_service, todo_body);
   (Services.add_service, todo_body);
   (Services.rss_service, todo_body);
-  (Services.login_service, todo_body);
-  (Services.register_service, Users.register_body);
 ]
 
 let _ =
@@ -63,10 +62,11 @@ let _ =
       ~service:service
       (page f)
   ) services;
-  Eliom_registration.Html5.register
-    ~service:Services.register_confirm_service
+  (* Users *)
+  Eliom_registration.Html5.register ~service:Services.register_service
+    (page Users.register_body);
+  Eliom_registration.Html5.register ~service:Services.login_service
+    (page Users.login_body);
+  Eliom_registration.Html5.register ~service:Users.register_confirm_service
     (page Users.register_confirm);
-
-  Eliom_registration.Action.register
-    ~service:Services.logout_service
-    (fun _ _ -> Eliom_state.discard ~scope:Eliom_common.default_session_scope ());
+  Users.register_services ()
