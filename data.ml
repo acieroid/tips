@@ -160,7 +160,7 @@ let get_all_tips () =
   get_tips ""
 
 let get_n_most_recent_tips n =
-  get_tips (Printf.sprintf "order by id desc limit %d" n)
+  get_tips (Printf.sprintf "order by tips.id desc limit %d" n)
 
 let get_random_tip () =
   match get_tips "order by random() limit 1" with
