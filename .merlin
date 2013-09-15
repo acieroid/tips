@@ -1,0 +1,7 @@
+PRJ tips
+S .
+B _server
+PKG ocsigenserver
+PKG eliom.server
+PKG sqlite3
+PKG sha
