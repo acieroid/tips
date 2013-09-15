@@ -8,44 +8,26 @@ open Eliom_content.Html5.D
   - Tips.display (tips list)
 *)
 
-let main_service =
-  Eliom_service.service ~path:[""] ~get_params:unit ()
-
-let all_service =
-  Eliom_service.service ~path:["all"] ~get_params:unit ()
-
-let random_service =
-  Eliom_service.service ~path:["random"] ~get_params:unit ()
-
-let tags_service =
-  Eliom_service.service ~path:["tags"] ~get_params:unit ()
-
-let add_service =
-  Eliom_service.service ~path:["add"] ~get_params:unit ()
-
-let rss_service =
-  Eliom_service.service ~path:["rss"] ~get_params:unit ()
-
 let menu () =
-  lwt connect = Lwt.return (p [pcdata "TODO: connect box"]) in
+  lwt connect = Users.connect_box () in
   Lwt.return (div [
     (* TODO: String.concat ? *)
-    a ~service:main_service [pcdata "home"] ();
+    a ~service:Services.main_service [pcdata "home"] ();
     pcdata " | ";
-    a ~service:all_service [pcdata "all"] ();
+    a ~service:Services.all_service [pcdata "all"] ();
     pcdata " | ";
-    a ~service:random_service [pcdata "random"] ();
+    a ~service:Services.random_service [pcdata "random"] ();
     pcdata " | ";
-    a ~service:tags_service [pcdata "tags"] ();
+    a ~service:Services.tags_service [pcdata "tags"] ();
     pcdata " | ";
-    a ~service:add_service [pcdata "add"] ();
+    a ~service:Services.add_service [pcdata "add"] ();
     pcdata " | ";
     connect;
   ])
 
 let footer =
   div ~a:[a_class ["footer"]]
-    [a ~service:rss_service [pcdata "rss"] ();
+    [a ~service:Services.rss_service [pcdata "rss"] ();
      (* pcdata " - " *)
      (* TODO: link to source code *)]
 
@@ -66,12 +48,14 @@ let empty_service_body _ _ =
        (body [h1 [pcdata "TODO"]]))
 
 let services = [
-  (main_service, main_service_body);
-  (all_service, empty_service_body);
-  (random_service, empty_service_body);
-  (tags_service, empty_service_body);
-  (add_service, empty_service_body);
-  (rss_service, empty_service_body);
+  (Services.main_service, main_service_body);
+  (Services.all_service, empty_service_body);
+  (Services.random_service, empty_service_body);
+  (Services.tags_service, empty_service_body);
+  (Services.add_service, empty_service_body);
+  (Services.rss_service, empty_service_body);
+  (Services.login_service, empty_service_body);
+  (Services.register_service, empty_service_body);
 ]
 
 let _ =
@@ -79,6 +63,9 @@ let _ =
     Eliom_registration.Html5.register
       ~service:service
       f
-  ) services
+  ) services;
+  Eliom_registration.Action.register
+    ~service:Services.logout_service
+    (fun _ _ -> Eliom_state.discard ~scope:Eliom_common.default_session_scope ());
 
 
