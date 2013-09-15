@@ -1,6 +1,5 @@
 let database_name = "tips.sqlite"
 
-(* val with_db : (Sqlite3.db -> 'a) -> 'a *)
 let with_db f =
   let db = Sqlite3.db_open database_name in
   try
@@ -20,6 +19,7 @@ let tables = [
                       user_id integer not null,
                       title varchar(256) not null,
                       content text not null,
+                      timestamp integer not null,
                       foreign key(user_id) references user(id))";
   "create table tags (id integer primary key not null,
                       tag varchar(256) not null)";
@@ -29,7 +29,7 @@ let tables = [
                            foreign key(tag_id) references tags(id))"
 ]
 
-(* val create_schema : unit -> unit *)
+
 let create_schema () =
   with_db (fun db ->
     List.iter (fun query ->
@@ -39,7 +39,6 @@ let create_schema () =
                           "): " ^ Sqlite3.errmsg db))
       tables)
 
-(* val execute_query : Sqlite3.db -> string -> Sqlite3.Data.t list -> (Sqlite3.stmt -> 'a) -> 'a list *)
 let execute_query db q args f =
   let query = Sqlite3.prepare db q in
   List.iteri (fun n arg ->
@@ -71,13 +70,11 @@ type user = {
     hash : Sha256.t option
   }
 
-(* val extract_hash : user -> string *)
 let extract_hash user =
   match user.hash with
   | Some h -> Sha256.to_hex h
   | None -> failwith "Password not specified"
 
-(* val add_user : user -> unit *)
 let add_user user =
   let _ = with_db (fun db ->
     execute_query db "insert into users(name, password) values (?, ?)"
@@ -86,7 +83,6 @@ let add_user user =
       (fun _ -> ())) in
   ()
 
-(* val auth_user : user -> bool *)
 let auth_user user =
   with_db (fun db ->
     let res = execute_query db
@@ -105,18 +101,20 @@ type tag = string
 
 type tip = {
     id : int;
+    author : user;
     title : string;
     content : string;
-    tags : tag list
+    timestamp : int;
+    tags : tag list;
   }
 
-(* val add_tip : tip -> int *)
 let add_tip tip user =
   with_db (fun db ->
     let _ = execute_query db
-        "insert into tips(user_id, title, content) select id, ?, ? from users where name = ?"
+        "insert into tips(user_id, title, content, timestamp) select id, ?, ?, ? from users where name = ?"
         [Sqlite3.Data.TEXT tip.title;
          Sqlite3.Data.TEXT tip.content;
+         Sqlite3.Data.INT (Int64.of_float (Unix.time ()));
          Sqlite3.Data.TEXT user.name]
         (fun _ -> ()); in
     let tip_id = Sqlite3.last_insert_rowid db in
@@ -135,38 +133,40 @@ let add_tip tip user =
       tip.tags;
     Int64.to_int tip_id)
 
-(* val get_tips : string -> tip list *)
 let get_tips filter =
   with_db (fun db ->
     execute_query db
-      ("select id, title, content from tips " ^ filter) []
+      ("select tips.id, tips.title, tips.content, tips.timestamp, users.name from tips join  users on tips.user_id = users.id " ^
+       filter) []
       (fun s ->
-        match (Sqlite3.column s 0,
-               Sqlite3.column s 1,
-               Sqlite3.column s 2) with
+        match (Sqlite3.column s 0, Sqlite3.column s 1,
+               Sqlite3.column s 2, Sqlite3.column s 3,
+               Sqlite3.column s 4) with
         | Sqlite3.Data.INT id,
           Sqlite3.Data.TEXT title,
-          Sqlite3.Data.TEXT content -> {id = Int64.to_int id;
-                                        title = title;
-                                        (* TODO: tags *)
-                                        content = content; tags = []}
+          Sqlite3.Data.TEXT content,
+          Sqlite3.Data.INT timestamp,
+          Sqlite3.Data.TEXT username ->
+            {id = Int64.to_int id;
+             author = {name=username; hash=None};
+             title = title;
+             (* TODO: tags *)
+             content = content;
+             timestamp = Int64.to_int timestamp;
+             tags = []}
         | _ -> failwith "Invalid query result"))
 
-(* val get_all_tips : unit -> tip list *)
 let get_all_tips () =
   get_tips ""
 
-(* val get_n_most_recent_tips : int -> tip *)
 let get_n_most_recent_tips n =
   get_tips (Printf.sprintf "order by id desc limit %d" n)
 
-(* val get_random_tip : unit -> tip option *)
 let get_random_tip () =
   match get_tips "order by random() limit 1" with
   | [] -> None
   | h::_ -> Some h
 
-(* val get_all_tags : unit -> tag list *)
 let get_all_tags () =
   with_db (fun db ->
     execute_query db
