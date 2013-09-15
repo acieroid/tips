@@ -25,9 +25,11 @@ let menu () =
 let footer =
   div ~a:[a_class ["footer"]]
     [a ~service:Services.rss_service [pcdata "rss"] ();
-     (* pcdata " - " *)
-     (* TODO: link to source code *)]
-
+     pcdata " - ";
+     Raw.a
+       ~a:[a_href (Raw.uri_of_string "https://github.com/acieroid/tips")]
+       [pcdata "source code"]
+   ]
 
 let page f a b =
   lwt menu = menu () in
