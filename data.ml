@@ -136,7 +136,7 @@ let add_tip tip user =
 let get_tips filter =
   with_db (fun db ->
     execute_query db
-      ("select tips.id, tips.title, tips.content, tips.timestamp, users.name from tips join  users on tips.user_id = users.id " ^
+      ("select tips.id, tips.title, tips.content, tips.timestamp, users.name from tips join users on tips.user_id = users.id " ^
        filter) []
       (fun s ->
         match (Sqlite3.column s 0, Sqlite3.column s 1,
@@ -155,6 +155,11 @@ let get_tips filter =
              timestamp = timestamp;
              tags = []}
         | _ -> failwith "Invalid query result"))
+
+let get_tip id =
+  match get_tips (Printf.sprintf "where tips.id = %d" id) with
+  | (h::_) -> Some h
+  | [] -> None
 
 let get_all_tips () =
   get_tips ""

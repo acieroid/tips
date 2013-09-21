@@ -65,6 +65,11 @@ let display tips =
 let home_body _ _ =
   Lwt.return (display (Data.get_n_most_recent_tips 5))
 
+let show_tip_body id _ =
+  match Data.get_tip id with
+  | Some tip -> Lwt.return (display [tip])
+  | None -> Lwt.return (p [pcdata "No such tip"])
+
 let todo_body _ _ =
   Lwt.return
     (p [pcdata "TODO"])
@@ -89,7 +94,7 @@ let _ =
   ) services;
   Eliom_registration.Html5.register
     ~service:Services.show_tip_service
-    (page todo_body);
+    (page show_tip_body);
   Eliom_registration.Html5.register
     ~service:Services.show_tag_service
     (page todo_body);
