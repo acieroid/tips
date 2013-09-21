@@ -43,32 +43,44 @@ let page f a b =
 
 let string_of_timestamp t = "TODO"
 
-let display tips =
-  let display_tip tip =
-    div ~a:[a_class ["element"]] [
-    a ~service:Services.show_tip_service [pcdata tip.Data.title] tip.Data.id;
-    br ();
-    div ~a:[a_class ["element-infos"]]
-      [pcdata ("by " ^ tip.Data.author.Data.name ^ " on " ^
-               (string_of_timestamp  tip.Data.timestamp))];
-    (* TODO: Md.to_html *)
-    pcdata tip.Data.content;
-    br ();
-    p ~a:[a_class ["tags"]]
-      (List.map (fun tag ->
-        a ~service:Services.show_tag_service [pcdata tag] tag) tip.Data.tags);
-  ]
-  in
+let display_tags tags =
+  let tag_link tag =
+    a ~service:Services.show_tag_service [pcdata tag] tag in
+  p ~a:[a_class ["tags"]]
+    (match tags with
+    | [] -> []
+    | _ ->
+        List.tl (List.fold_right (fun tag l ->
+          [pcdata ", "; tag_link tag] @ l)
+                   tags []))
+
+let display_tip tip =
+  div ~a:[a_class ["element"]] [
+  a ~service:Services.show_tip_service [pcdata tip.Data.title] tip.Data.id;
+  br ();
+  div ~a:[a_class ["element-infos"]]
+    [pcdata ("by " ^ tip.Data.author.Data.name ^ " on " ^
+             (string_of_timestamp  tip.Data.timestamp))];
+  (* TODO: Md.to_html *)
+  pcdata tip.Data.content;
+  br ();
+  display_tags tip.Data.tags;
+]
+
+let display_tips tips =
   div ~a:[a_class ["elements"]]
     (List.map display_tip tips)
 
 let home_body _ _ =
-  Lwt.return (display (Data.get_n_most_recent_tips 5))
+  Lwt.return (display_tips (Data.get_n_most_recent_tips 5))
 
 let show_tip_body id _ =
   match Data.get_tip id with
-  | Some tip -> Lwt.return (display [tip])
+  | Some tip -> Lwt.return (display_tip tip)
   | None -> Lwt.return (p [pcdata "No such tip"])
+
+let tags_body _ _ =
+  Lwt.return (display_tags (Data.get_all_tags ()))
 
 let todo_body _ _ =
   Lwt.return
@@ -82,7 +94,7 @@ let random_page _ _ =
 let services = [
   (Services.main_service, home_body);
   (Services.all_service, todo_body);
-  (Services.tags_service, todo_body);
+  (Services.tags_service, tags_body);
   (Services.rss_service, todo_body);
 ]
 
