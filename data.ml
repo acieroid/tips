@@ -135,26 +135,36 @@ let add_tip tip user =
 
 let get_tips filter =
   with_db (fun db ->
-    execute_query db
-      ("select tips.id, tips.title, tips.content, tips.timestamp, users.name from tips join users on tips.user_id = users.id " ^
-       filter) []
-      (fun s ->
-        match (Sqlite3.column s 0, Sqlite3.column s 1,
-               Sqlite3.column s 2, Sqlite3.column s 3,
-               Sqlite3.column s 4) with
-        | Sqlite3.Data.INT id,
-          Sqlite3.Data.TEXT title,
-          Sqlite3.Data.TEXT content,
-          Sqlite3.Data.INT timestamp,
-          Sqlite3.Data.TEXT username ->
-            {id = Int64.to_int id;
-             author = {name=username; hash=None};
-             title = title;
-             (* TODO: tags *)
-             content = content;
-             timestamp = timestamp;
-             tags = []}
-        | _ -> failwith "Invalid query result"))
+    let fill_tags tip =
+      let tags = execute_query db
+          ("select tags.tag from tags join tips_tags on tags.id = tips_tags.tag_id where tips_tags.tip_id = ?")
+          [Sqlite3.Data.INT (Int64.of_int tip.id)]
+          (fun s ->
+            match (Sqlite3.column s 0) with
+            | Sqlite3.Data.TEXT tag -> tag
+            | _ -> failwith "Invalid query result") in
+      {tip with tags = tags} in
+    let tips =
+      execute_query db
+        ("select tips.id, tips.title, tips.content, tips.timestamp, users.name from tips join users on tips.user_id = users.id " ^
+         filter) []
+        (fun s ->
+          match (Sqlite3.column s 0, Sqlite3.column s 1,
+                 Sqlite3.column s 2, Sqlite3.column s 3,
+                 Sqlite3.column s 4) with
+          | Sqlite3.Data.INT id,
+            Sqlite3.Data.TEXT title,
+            Sqlite3.Data.TEXT content,
+            Sqlite3.Data.INT timestamp,
+            Sqlite3.Data.TEXT username ->
+              {id = Int64.to_int id;
+               author = {name=username; hash=None};
+               title = title;
+               content = content;
+               timestamp = timestamp;
+               tags = []}
+          | _ -> failwith "Invalid query result") in
+    List.map fill_tags tips)
 
 let get_tip id =
   match get_tips (Printf.sprintf "where tips.id = %d" id) with
