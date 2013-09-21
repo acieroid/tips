@@ -5,6 +5,8 @@ type user = {
     hash : Sha256.t option
   }
 
+val empty_user : user
+
 val add_user : user -> unit
 val auth_user : user -> bool
 
@@ -18,6 +20,8 @@ type tip = {
     timestamp : int64;
     tags : tag list;
   }
+
+val empty_tip : tip
 
 val add_tip : tip -> user -> int
 val get_tip : int -> tip option

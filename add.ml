@@ -7,21 +7,28 @@ let add_confirm_service =
     ~post_params:(string "title" ** string "content" ** string "tags")
     ()
 
-let add_form =
+let tip_form tip submit_text =
   post_form ~service:add_confirm_service
     (fun (title, (content, tags)) ->
       [fieldset
          [label ~a:[a_for title] [pcdata "title: "];
-          string_input ~input_type:`Text ~name:title ();
+          string_input ~input_type:`Text ~name:title () ~value:tip.Data.title;
           br ();
           label ~a:[a_for content] [pcdata "content: "];
-          textarea ~name:content ();
+          textarea ~name:content () ~value:tip.Data.content;
           br ();
           label ~a:[a_for tags] [pcdata "tags (comma separated): "];
-          string_input ~input_type:`Text ~name:tags ();
+          string_input ~input_type:`Text ~name:tags ()
+            ~value:(String.concat "," tip.Data.tags);
           br ();
-          string_input ~input_type:`Submit ~value:"add" ()
+          string_input ~input_type:`Submit ~value:submit_text ()
         ]])
+
+let edit_form tip =
+  tip_form tip "edit"
+
+let add_form =
+  tip_form Data.empty_tip "add"
 
 let add_body =
   Lwt.return (add_form ())

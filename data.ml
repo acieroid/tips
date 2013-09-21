@@ -22,7 +22,7 @@ let tables = [
                       timestamp integer not null,
                       foreign key(user_id) references user(id))";
   "create table tags (id integer primary key not null,
-                      tag varchar(256) not null)";
+                      tag varchar(256) unique not null)";
   "create table tips_tags (tip_id integer not null,
                            tag_id integer not null,
                            foreign key(tip_id) references tips(id),
@@ -70,6 +70,11 @@ type user = {
     hash : Sha256.t option
   }
 
+let empty_user = {
+  name = "";
+  hash = None;
+}
+
 let extract_hash user =
   match user.hash with
   | Some h -> Sha256.to_hex h
@@ -108,6 +113,35 @@ type tip = {
     tags : tag list;
   }
 
+let empty_tip = {
+  id = 0;
+  author = empty_user;
+  title = "";
+  content = "";
+  timestamp = Int64.of_int 0;
+  tags = [];
+}
+
+let find_or_insert_tag tag db =
+  let r = execute_query db
+      "select id from tags where tag = ?"
+      [Sqlite3.Data.TEXT tag]
+      (fun s ->
+        match Sqlite3.column s 0 with
+        | Sqlite3.Data.INT id -> id
+        | _ -> failwith "Invalid query result") in
+  match r with
+  | id::_ ->
+      (* tag already exists *)
+      id
+  | [] ->
+      (* tag don't exists, add it *)
+      let _ = execute_query db
+          "insert into tags(tag) values (?)"
+          [Sqlite3.Data.TEXT tag]
+          (fun _ -> ()); in
+      Sqlite3.last_insert_rowid db
+
 let add_tip tip user =
   with_db (fun db ->
     let _ = execute_query db
@@ -119,11 +153,7 @@ let add_tip tip user =
         (fun _ -> ()); in
     let tip_id = Sqlite3.last_insert_rowid db in
     List.iter (fun tag ->
-      let _ = execute_query db
-          "insert or replace into tags(tag) values (?)"
-          [Sqlite3.Data.TEXT tag]
-          (fun _ -> ()); in
-      let tag_id = Sqlite3.last_insert_rowid db in
+      let tag_id = find_or_insert_tag tag db in
       let _ = execute_query db
           "insert into tips_tags(tip_id, tag_id) values (?, ?)"
           [Sqlite3.Data.INT tip_id;
