@@ -167,6 +167,11 @@ let get_random_tip () =
   | [] -> None
   | h::_ -> Some h
 
+let get_random_tip_id () =
+  match get_random_tip () with
+  | Some t -> t.id
+  | None -> failwith "No tip exists"
+
 let get_all_tags () =
   with_db (fun db ->
     execute_query db

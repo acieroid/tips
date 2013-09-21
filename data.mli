@@ -23,6 +23,7 @@ val add_tip : tip -> user -> int
 val get_all_tips : unit -> tip list
 val get_n_most_recent_tips : int -> tip list
 val get_random_tip : unit -> tip option
+val get_random_tip_id : unit -> int
 
 val get_all_tags : unit -> tag list
 

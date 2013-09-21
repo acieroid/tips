@@ -69,10 +69,14 @@ let todo_body _ _ =
   Lwt.return
     (p [pcdata "TODO"])
 
+let random_page _ _ =
+  Lwt.return (Eliom_service.preapply
+                ~service:Services.show_tip_service
+                (Data.get_random_tip_id ()))
+
 let services = [
   (Services.main_service, home_body);
   (Services.all_service, todo_body);
-  (Services.random_service, todo_body);
   (Services.tags_service, todo_body);
   (Services.rss_service, todo_body);
 ]
@@ -89,6 +93,10 @@ let _ =
   Eliom_registration.Html5.register
     ~service:Services.show_tag_service
     (page todo_body);
+  Eliom_registration.Redirection.register
+    ~service:Services.random_service
+    ~options:`TemporaryRedirect
+    random_page ;
   (* Users *)
   Eliom_registration.Html5.register ~service:Services.register_service
     (page Users.register_body);
