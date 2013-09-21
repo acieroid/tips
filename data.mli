@@ -15,7 +15,7 @@ type tip = {
     author : user;
     title : string;
     content : string;
-    timestamp : int;
+    timestamp : int64;
     tags : tag list;
   }
 
@@ -25,3 +25,8 @@ val get_n_most_recent_tips : int -> tip list
 val get_random_tip : unit -> tip option
 
 val get_all_tags : unit -> tag list
+
+val now : unit -> int64
+val validate_title : string -> string
+val validate_content : string -> string
+val split_tags : string -> tag list

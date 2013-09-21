@@ -62,7 +62,6 @@ let display tips =
   div ~a:[a_class ["elements"]]
     (List.map display_tip tips)
 
-
 let home_body _ _ =
   Lwt.return (display (Data.get_n_most_recent_tips 5))
 
@@ -75,7 +74,6 @@ let services = [
   (Services.all_service, todo_body);
   (Services.random_service, todo_body);
   (Services.tags_service, todo_body);
-  (Services.add_service, todo_body);
   (Services.rss_service, todo_body);
 ]
 
@@ -98,4 +96,9 @@ let _ =
     (page Users.login_body);
   Eliom_registration.Html5.register ~service:Users.register_confirm_service
     (page Users.register_confirm);
-  Users.register_services ()
+  Users.register_services ();
+  (* Add *)
+  Eliom_registration.Html5.register ~service:Services.add_service
+    (page Add.add_body);
+  Eliom_registration.Html5.register ~service:Add.add_confirm_service
+    (page Add.add_confirm);

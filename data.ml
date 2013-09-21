@@ -104,7 +104,7 @@ type tip = {
     author : user;
     title : string;
     content : string;
-    timestamp : int;
+    timestamp : int64;
     tags : tag list;
   }
 
@@ -152,7 +152,7 @@ let get_tips filter =
              title = title;
              (* TODO: tags *)
              content = content;
-             timestamp = Int64.to_int timestamp;
+             timestamp = timestamp;
              tags = []}
         | _ -> failwith "Invalid query result"))
 
@@ -175,3 +175,19 @@ let get_all_tags () =
         match Sqlite3.column s 0 with
         | Sqlite3.Data.TEXT tag -> tag
         | _ -> failwith "Invalid query result"))
+
+let now () =
+  Int64.of_float (Unix.time ())
+
+let validate_title title =
+  if String.length title > 256 then
+    failwith "Title length too long (should be less than 256 characters)"
+  else
+    title
+
+let validate_content content =
+  (* TODO: validate markdown *)
+  content
+
+let split_tags tags =
+  Str.split (Str.regexp " ?, ?") tags
