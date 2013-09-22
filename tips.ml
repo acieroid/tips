@@ -100,18 +100,14 @@ let services = [
 
 let _ =
   List.iter (fun (service, f) ->
-    Eliom_registration.Html5.register
-      ~service:service
+    Eliom_registration.Html5.register ~service:service
       (page f)
   ) services;
-  Eliom_registration.Html5.register
-    ~service:Services.show_tip_service
+  Eliom_registration.Html5.register ~service:Services.show_tip_service
     (page show_tip_body);
-  Eliom_registration.Html5.register
-    ~service:Services.show_tag_service
+  Eliom_registration.Html5.register ~service:Services.show_tag_service
     (page todo_body);
-  Eliom_registration.Redirection.register
-    ~service:Services.random_service
+  Eliom_registration.Redirection.register ~service:Services.random_service
     ~options:`TemporaryRedirect
     random_page ;
   (* Users *)
@@ -127,3 +123,5 @@ let _ =
     (page Add.add_body);
   Eliom_registration.Html5.register ~service:Add.add_confirm_service
     (page Add.add_confirm);
+  Eliom_registration.Html5.register ~service:Services.edit_service
+    (page Add.edit_body);

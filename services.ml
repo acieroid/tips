@@ -16,6 +16,9 @@ let tags_service =
 let add_service =
   Eliom_service.service ~path:["add"] ~get_params:unit ()
 
+let edit_service =
+  Eliom_service.service ~path:["edit"] ~get_params:(suffix (int "id")) ()
+
 (* Footer *)
 let rss_service =
   Eliom_service.service ~path:["rss"] ~get_params:unit ()

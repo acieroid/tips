@@ -24,6 +24,7 @@ type tip = {
 val empty_tip : tip
 
 val add_tip : tip -> user -> int
+val update_tip : tip -> user -> int
 val get_tip : int -> tip option
 val get_all_tips : unit -> tip list
 val get_n_most_recent_tips : int -> tip list

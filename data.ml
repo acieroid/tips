@@ -163,6 +163,33 @@ let add_tip tip user =
       tip.tags;
     Int64.to_int tip_id)
 
+let update_tip tip user =
+  if user = tip.author then
+    with_db (fun db ->
+      let tip_id = Int64.of_int tip.id in
+      let _ = execute_query db
+          "update tips set title=?, content=? where id=?"
+          [Sqlite3.Data.TEXT tip.title;
+           Sqlite3.Data.TEXT tip.content;
+           Sqlite3.Data.INT tip_id]
+          (fun _ -> ())
+      in
+      let _ = execute_query db
+          "delete from tips_tags where tip_id=?"
+          [Sqlite3.Data.INT tip_id] in
+      List.iter (fun tag ->
+        let tag_id = find_or_insert_tag tag db in
+        let _ = execute_query db
+            "insert into tips_tags(tip_id, tag_id) values (?, ?)"
+            [Sqlite3.Data.INT tip_id;
+             Sqlite3.Data.INT tag_id]
+            (fun _ -> ()) in
+        ())
+        tip.tags;
+      tip.id)
+  else
+    failwith "User is not the author of the tip"
+
 let get_tips filter =
   with_db (fun db ->
     let fill_tags tip =
