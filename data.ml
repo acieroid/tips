@@ -2,14 +2,10 @@ let database_name = "tips.sqlite"
 
 let with_db f =
   let db = Sqlite3.db_open database_name in
-  try
-    let res = f db in
-    begin match Sqlite3.db_close db with
-    | true -> res
-    | false -> failwith ("Database not closed (busy): " ^ Sqlite3.errmsg db)
-    end
-  with
-    e -> raise e
+  let res = f db in
+  match Sqlite3.db_close db with
+  | true -> res
+  | false -> failwith ("Database not closed (busy): " ^ Sqlite3.errmsg db)
 
 let tables = [
   "create table users (id integer primary key not null,
