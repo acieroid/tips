@@ -1,9 +1,6 @@
 open Eliom_content.Html5.D
 open Eliom_parameter
-
-(* TODO:
-   - create database schema if db doesn't exist yet
-*)
+open CalendarLib
 
 let menu () =
   lwt connect = Users.connect_box () in
@@ -41,7 +38,9 @@ let page f a b =
               content;
               footer]))
 
-let string_of_timestamp t = "TODO"
+let string_of_timestamp t =
+  let date = Date.from_unixfloat (Int64.to_float t) in
+  Printer.Date.to_string date
 
 let display_tags tags =
   let tag_link tag =
@@ -60,7 +59,7 @@ let display_tip tip =
   br ();
   div ~a:[a_class ["element-infos"]]
     [pcdata ("by " ^ tip.Data.author.Data.name ^ " on " ^
-             (string_of_timestamp  tip.Data.timestamp))];
+             (string_of_timestamp tip.Data.timestamp))];
   (* TODO: Md.to_html *)
   pcdata tip.Data.content;
   br ();
@@ -79,7 +78,6 @@ let display_tip_short tip =
 let display_tips tips =
   div ~a:[a_class ["elements"]]
     (List.map display_tip tips)
-
 
 let home_body _ _ =
   Lwt.return (display_tips (Data.get_n_most_recent_tips 5))
