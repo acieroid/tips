@@ -67,9 +67,19 @@ let display_tip tip =
   display_tags tip.Data.tags;
 ]
 
+let display_tip_short tip =
+  div [
+  a ~service:Services.show_tip_service [pcdata tip.Data.title] tip.Data.id;
+  br ();
+  div ~a:[a_class ["element-infos"]]
+    [pcdata ("by " ^ tip.Data.author.Data.name ^ " on " ^
+             (string_of_timestamp  tip.Data.timestamp))];
+]
+
 let display_tips tips =
   div ~a:[a_class ["elements"]]
     (List.map display_tip tips)
+
 
 let home_body _ _ =
   Lwt.return (display_tips (Data.get_n_most_recent_tips 5))
@@ -78,6 +88,9 @@ let show_tip_body id _ =
   match Data.get_tip id with
   | Some tip -> Lwt.return (display_tip tip)
   | None -> Lwt.return (p [pcdata "No such tip"])
+
+let all_body _ _ =
+  Lwt.return (div (List.map display_tip_short (Data.get_all_tips ())))
 
 let tags_body _ _ =
   Lwt.return (display_tags (Data.get_all_tags ()))
@@ -93,7 +106,7 @@ let random_page _ _ =
 
 let services = [
   (Services.main_service, home_body);
-  (Services.all_service, todo_body);
+  (Services.all_service, all_body);
   (Services.tags_service, tags_body);
   (Services.rss_service, todo_body);
 ]
