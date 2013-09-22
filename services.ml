@@ -31,7 +31,7 @@ let register_service =
   Eliom_service.service ~path:["register"] ~get_params:unit ()
 
 let logout_service =
-  Eliom_service.post_coservice' ~post_params:unit ()
+  Eliom_service.coservice' ~get_params:unit ()
 
 (* Other pages *)
 let show_tip_service =

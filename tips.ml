@@ -4,8 +4,7 @@ open CalendarLib
 
 let menu () =
   lwt connect = Users.connect_box () in
-  Lwt.return (div [
-    (* TODO: String.concat ? *)
+  Lwt.return (div ([
     a ~service:Services.main_service [pcdata "home"] ();
     pcdata " | ";
     a ~service:Services.all_service [pcdata "all"] ();
@@ -16,8 +15,7 @@ let menu () =
     pcdata " | ";
     a ~service:Services.add_service [pcdata "add"] ();
     pcdata " | ";
-    connect;
-  ])
+  ] @ connect))
 
 let footer =
   div ~a:[a_class ["footer"]]

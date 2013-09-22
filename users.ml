@@ -24,25 +24,18 @@ let is_admin =
   Eliom_reference.eref ~scope:Eliom_common.default_session_scope
     false
 
-let disconnect_box () =
-  post_form Services.logout_service
-    (fun _ -> [fieldset
-                 [string_input
-                    ~input_type:`Submit
-                    ~value:"(logout)" ()]]) ()
-
 let connect_box () =
   lwt user = Eliom_reference.get user in
   lwt admin = Eliom_reference.get is_admin in
   Lwt.return
     (match user with
-    | Some u -> div [p [pcdata ("connected as " ^
-                                (if admin then "@" else "") ^
-                                u.Data.name)];
-                        disconnect_box ()]
-    | None -> div [p [a ~service:Services.login_service [pcdata "login"] ();
-                      pcdata " or ";
-                      a ~service:Services.register_service [pcdata "register"] ()]])
+    | Some u -> [pcdata ("connected as " ^
+                         (if admin then "@" else "") ^
+                         u.Data.name ^ " ");
+                 a ~service:Services.logout_service [pcdata "(logout)"] ()]
+    | None -> [a ~service:Services.login_service [pcdata "login"] ();
+               pcdata " or ";
+               a ~service:Services.register_service [pcdata "register"] ()])
 
 let register_form =
   post_form ~service:register_confirm_service
