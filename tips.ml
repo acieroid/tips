@@ -2,6 +2,15 @@ open Eliom_content.Html5.D
 open Eliom_parameter
 open CalendarLib
 
+(* TODO:
+  - admin
+  - display errors in a box
+  - delete page
+  - tags page
+  - delete/edit links
+  - css
+*)
+
 let menu () =
   lwt connect = Users.connect_box () in
   Lwt.return (div ([

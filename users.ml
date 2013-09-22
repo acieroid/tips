@@ -13,15 +13,13 @@ let register_confirm_service =
     ~post_params:(string "username" ** string "password1" ** string "password2")
     ()
 
-(* TODO:
-  - login service
-  - register service
-  - use a cookie for the username? *)
 let user =
-  Eliom_reference.eref ~scope:Eliom_common.default_session_scope
+  Eliom_reference.eref
+    ~scope:Eliom_common.default_session_scope
     (None : Data.user option)
 let is_admin =
-  Eliom_reference.eref ~scope:Eliom_common.default_session_scope
+  Eliom_reference.eref
+    ~scope:Eliom_common.default_session_scope
     false
 
 let connect_box () =
@@ -89,10 +87,11 @@ let login_form =
 let login_body _ _ =
   Lwt.return (login_form ())
 
+let (>>=) = Lwt.bind
 let login_confirm () (name, password) =
   let u = {Data.name=name; Data.hash=Some (Sha256.string password)} in
   if Data.auth_user u then
-    Eliom_reference.set user (Some u)
+    Eliom_reference.set user (Some {u with Data.hash=None})
   else
     (* TODO: display error *)
     Lwt.return ()
