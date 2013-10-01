@@ -91,10 +91,38 @@ let add_confirm () values =
 let edit_confirm () values =
   tip_form_confirm `Edit values
 
-let add_body _ _ =
+let add_body () () =
   add_form ()
 
-let edit_body id _ =
-  (match Data.get_tip id with
+let edit_body id () =
+  match Data.get_tip id with
   | Some tip -> edit_form tip ()
-  | None -> Lwt.return (div [p [pcdata "Tip doesn't exists"]]))
+  | None -> Lwt.return (div [p [pcdata "Tip doesn't exists"]])
+
+let delete_body id () =
+  match Data.get_tip id with
+  | Some tip ->
+      lwt user = Eliom_reference.get Users.user in
+      Lwt.return
+        begin match user with
+        | Some u ->
+            let delete_confirm_service =
+              Eliom_registration.Action.register_post_coservice
+                ~fallback:Services.main_service
+                ~post_params:Eliom_parameter.unit
+                ~timeout:60.
+                (fun () () -> Lwt.return (Data.delete_tip id)) in
+            div [post_form ~service:delete_confirm_service
+                   (fun () ->
+                     [fieldset
+                        [label [pcdata "Really delete this tip?"];
+                         string_input ~input_type:`Submit ~value:"yes" ()]])
+                   ();
+                 Tip.display_tip tip]
+        | None ->
+            p [pcdata "Please ";
+               a ~service:Services.register_service [pcdata "register"] ();
+               pcdata "."]
+        end
+  | None -> Lwt.return (div [p [pcdata "Tip doesn't exists"]])
+

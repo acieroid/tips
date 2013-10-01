@@ -16,8 +16,13 @@ let tags_service =
 let add_service =
   Eliom_service.service ~path:["add"] ~get_params:unit ()
 
+(* Tip management pages *)
+
 let edit_service =
   Eliom_service.service ~path:["edit"] ~get_params:(suffix (int "id")) ()
+
+let delete_service =
+  Eliom_service.service ~path:["delete"] ~get_params:(suffix (int "id")) ()
 
 (* Footer *)
 let rss_service =

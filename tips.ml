@@ -1,11 +1,9 @@
 open Eliom_content.Html5.D
 open Eliom_parameter
-open CalendarLib
 
 (* TODO:
   - admin
-  - display errors in a box
-  - delete page
+  - display errors in a box (login error, ...)
   - tags page
   - delete/edit links
   - css
@@ -45,60 +43,19 @@ let page f a b =
               content;
               footer]))
 
-let string_of_timestamp t =
-  let date = Date.from_unixfloat (Int64.to_float t) in
-  Printer.Date.to_string date
-
-let display_tags tags =
-  let tag_link tag =
-    a ~service:Services.show_tag_service [pcdata tag] tag in
-  p ~a:[a_class ["tags"]]
-    (match tags with
-    | [] -> []
-    | _ ->
-        List.tl (List.fold_right (fun tag l ->
-          [pcdata ", "; tag_link tag] @ l)
-                   tags []))
-
-let display_tip tip =
-  div ~a:[a_class ["element"]] [
-  a ~service:Services.show_tip_service [pcdata tip.Data.title] tip.Data.id;
-  br ();
-  div ~a:[a_class ["element-infos"]]
-    [pcdata ("by " ^ tip.Data.author.Data.name ^ " on " ^
-             (string_of_timestamp tip.Data.timestamp))];
-  (* TODO: Md.to_html *)
-  pcdata tip.Data.content;
-  br ();
-  display_tags tip.Data.tags;
-]
-
-let display_tip_short tip =
-  div [
-  a ~service:Services.show_tip_service [pcdata tip.Data.title] tip.Data.id;
-  br ();
-  div ~a:[a_class ["element-infos"]]
-    [pcdata ("by " ^ tip.Data.author.Data.name ^ " on " ^
-             (string_of_timestamp  tip.Data.timestamp))];
-]
-
-let display_tips tips =
-  div ~a:[a_class ["elements"]]
-    (List.map display_tip tips)
-
 let home_body _ _ =
-  Lwt.return (display_tips (Data.get_n_most_recent_tips 5))
+  Lwt.return (Tip.display_tips (Data.get_n_most_recent_tips 5))
 
 let show_tip_body id _ =
   match Data.get_tip id with
-  | Some tip -> Lwt.return (display_tip tip)
+  | Some tip -> Lwt.return (Tip.display_tip tip)
   | None -> Lwt.return (p [pcdata "No such tip"])
 
 let all_body _ _ =
-  Lwt.return (div (List.map display_tip_short (Data.get_all_tips ())))
+  Lwt.return (div (List.map Tip.display_tip_short (Data.get_all_tips ())))
 
 let tags_body _ _ =
-  Lwt.return (display_tags (Data.get_all_tags ()))
+  Lwt.return (Tip.display_tags (Data.get_all_tags ()))
 
 let todo_body _ _ =
   Lwt.return
@@ -136,10 +93,12 @@ let _ =
   Eliom_registration.Html5.register ~service:Users.register_confirm_service
     (page Users.register_confirm);
   Users.register_services ();
-  (* Add *)
+  (* Tip management *)
   Eliom_registration.Html5.register ~service:Services.add_service
     (page Add.add_body);
   Eliom_registration.Html5.register ~service:Add.add_confirm_service
     (page Add.add_confirm);
   Eliom_registration.Html5.register ~service:Services.edit_service
     (page Add.edit_body);
+  Eliom_registration.Html5.register ~service:Services.delete_service
+    (page Add.delete_body);

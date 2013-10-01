@@ -146,7 +146,7 @@ let add_tip tip user =
          Sqlite3.Data.TEXT tip.content;
          Sqlite3.Data.INT (Int64.of_float (Unix.time ()));
          Sqlite3.Data.TEXT user.name]
-        (fun _ -> ()); in
+        (fun _ -> ()) in
     let tip_id = Sqlite3.last_insert_rowid db in
     List.iter (fun tag ->
       let tag_id = find_or_insert_tag tag db in
@@ -158,6 +158,14 @@ let add_tip tip user =
       ())
       tip.tags;
     Int64.to_int tip_id)
+
+let delete_tip id =
+  with_db (fun db ->
+    let _ = execute_query db
+        "delete from tips where id = ?"
+        [Sqlite3.Data.INT (Int64.of_int id)]
+        (fun _ -> ()) in
+    ())
 
 let update_tip tip user =
   if user = tip.author then
