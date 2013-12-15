@@ -84,18 +84,21 @@ let add_user user =
       (fun _ -> ())) in
   ()
 
-let auth_user user =
+let auth_user user password =
   with_db (fun db ->
     let res = execute_query db
-        "select id from users where name = ? and password = ?"
-        [Sqlite3.Data.TEXT user.name;
-         Sqlite3.Data.TEXT (extract_hash user)]
-        (fun s -> match Sqlite3.column s 0 with
-        | Sqlite3.Data.INT n -> n
+        "select id, password from users where name = ?"
+        [Sqlite3.Data.TEXT user.name]
+        (fun s -> match Sqlite3.column s 0, Sqlite3.column s 1 with
+        | Sqlite3.Data.INT n, Sqlite3.Data.TEXT hash ->
+          if Bcrypt.verify password (Bcrypt.hash_of_string hash) then
+            Some n
+          else
+            None
         | _ -> failwith "Invalid ID type")
     in
     match res with
-    | [id] -> true
+    | [Some id] -> true
     | _ -> false)
 
 type tag = string

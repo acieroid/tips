@@ -17,6 +17,7 @@ let user =
   Eliom_reference.eref
     ~scope:Eliom_common.default_session_scope
     (None : Data.user option)
+
 let is_admin =
   Eliom_reference.eref
     ~scope:Eliom_common.default_session_scope
@@ -87,10 +88,9 @@ let login_form =
 let login_body _ _ =
   Lwt.return (login_form ())
 
-let (>>=) = Lwt.bind
 let login_confirm () (name, password) =
-  let u = {Data.name=name; Data.hash=Some (Bcrypt.hash password)} in
-  if Data.auth_user u then
+  let u = {Data.name=name; Data.hash=None} in
+  if Data.auth_user u password then
     Eliom_reference.set user (Some {u with Data.hash=None})
   else
     (* TODO: display error *)

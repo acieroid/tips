@@ -5,6 +5,7 @@ open Eliom_parameter
   - admin
   - display errors in a box (login error, ...)
   - delete/edit links
+  - rss
 *)
 
 let menu () =
