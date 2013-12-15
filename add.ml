@@ -118,11 +118,10 @@ let delete_body id () =
                         [label [pcdata "Really delete this tip?"];
                          string_input ~input_type:`Submit ~value:"yes" ()]])
                    ();
-                 Tip.display_tip tip]
+                 Tip.display_tip user tip]
         | None ->
             p [pcdata "Please ";
                a ~service:Services.register_service [pcdata "register"] ();
                pcdata "."]
         end
   | None -> Lwt.return (div [p [pcdata "Tip doesn't exists"]])
-

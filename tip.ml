@@ -16,13 +16,17 @@ let display_tags tags =
           [pcdata ", "; tag_link tag] @ l)
                    tags []))
 
-let display_tip tip =
+let display_tip user tip =
   div ~a:[a_class ["element"]] [
   a ~service:Services.show_tip_service [pcdata tip.Data.title] tip.Data.id;
   br ();
   div ~a:[a_class ["element-infos"]]
-    [pcdata ("by " ^ tip.Data.author.Data.name ^ " on " ^
-             (string_of_timestamp tip.Data.timestamp))];
+    ((pcdata ("by " ^ tip.Data.author.Data.name ^ " on " ^
+             (string_of_timestamp tip.Data.timestamp)) ::
+        match user with
+        | Some u ->
+          [] (* TODO *)
+        | _ -> []));
   Md.to_html tip.Data.content;
   display_tags tip.Data.tags;
 ]
@@ -36,6 +40,6 @@ let display_tip_short tip =
              (string_of_timestamp  tip.Data.timestamp))];
 ]
 
-let display_tips tips =
+let display_tips user tips =
   div ~a:[a_class ["elements"]]
-    (List.map display_tip tips)
+    (List.map (display_tip user) tips)

@@ -45,11 +45,13 @@ let page f a b =
               footer]))
 
 let home_body _ _ =
-  Lwt.return (Tip.display_tips (Data.get_n_most_recent_tips 5))
+  lwt user = Eliom_reference.get Users.user in
+  Lwt.return (Tip.display_tips user (Data.get_n_most_recent_tips 5))
 
 let show_tip_body id _ =
+  lwt user = Eliom_reference.get Users.user in
   match Data.get_tip id with
-  | Some tip -> Lwt.return (Tip.display_tip tip)
+  | Some tip -> Lwt.return (Tip.display_tip user tip)
   | None -> Lwt.return (p [pcdata "No such tip"])
 
 let all_body _ _ =
