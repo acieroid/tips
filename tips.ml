@@ -57,6 +57,9 @@ let all_body _ _ =
 let tags_body _ _ =
   Lwt.return (Tip.display_tags (Data.get_all_tags ()))
 
+let show_tag_body tag _ =
+  Lwt.return (div (List.map Tip.display_tip_short (Data.get_tips_with_tag tag)))
+
 let todo_body _ _ =
   Lwt.return
     (p [pcdata "TODO"])
@@ -81,7 +84,7 @@ let _ =
   Eliom_registration.Html5.register ~service:Services.show_tip_service
     (page show_tip_body);
   Eliom_registration.Html5.register ~service:Services.show_tag_service
-    (page todo_body);
+    (page show_tag_body);
   Eliom_registration.Redirection.register ~service:Services.random_service
     ~options:`TemporaryRedirect
     random_page ;

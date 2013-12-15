@@ -1,6 +1,7 @@
 PRJ tips
 S .
 B _server
+PKG lwt
 PKG ocsigenserver
 PKG eliom.server
 PKG sqlite3

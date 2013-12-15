@@ -48,7 +48,7 @@ let execute_query db q args f =
     match Sqlite3.step query with
     | Sqlite3.Rc.DONE ->
         begin match Sqlite3.finalize query with
-        | Sqlite3.Rc.OK -> acc
+        | Sqlite3.Rc.OK -> List.rev acc
         | err -> failwith
               ("Error when finalizing a query (" ^ q ^
                "): " ^ Sqlite3.errmsg db)
@@ -233,10 +233,17 @@ let get_tip id =
   | [] -> None
 
 let get_all_tips () =
-  get_tips ""
+  get_tips "order by tips.timestamp desc"
 
 let get_n_most_recent_tips n =
-  get_tips (Printf.sprintf "order by tips.id desc limit %d" n)
+  get_tips (Printf.sprintf "order by tips.timestamp desc limit %d" n)
+
+let get_tips_with_tag tag =
+  let valid = Str.string_match (Str.regexp "[a-z0-9A-Z]") tag 0 in
+  if valid then
+    get_tips (Printf.sprintf "where tips.id in (select tip_id from tips_tags where tag_id = (select id from tags where tag = \"%s\")) order by tips.timestamp desc" tag)
+  else
+    []
 
 let get_random_tip () =
   match get_tips "order by random() limit 1" with
