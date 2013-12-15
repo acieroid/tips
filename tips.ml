@@ -4,7 +4,6 @@ open Eliom_parameter
 (* TODO:
   - admin
   - display errors in a box (login error, ...)
-  - tags page
   - delete/edit links
   - css
 *)
