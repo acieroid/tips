@@ -25,7 +25,10 @@ let display_tip user tip =
              (string_of_timestamp tip.Data.timestamp)) ::
         match user with
         | Some u ->
-          [] (* TODO *)
+          [pcdata " ";
+           a ~service:Services.edit_service [pcdata "edit"] tip.Data.id;
+           pcdata " | ";
+           a ~service:Services.delete_service [pcdata "delete"] tip.Data.id]
         | _ -> []));
   Md.to_html tip.Data.content;
   display_tags tip.Data.tags;
