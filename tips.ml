@@ -2,15 +2,15 @@ open Eliom_content.Html5.D
 open Eliom_parameter
 
 (* TODO:
+  - salt passwords or use safepass
   - admin
   - display errors in a box (login error, ...)
   - delete/edit links
-  - css
 *)
 
 let menu () =
   lwt connect = Users.connect_box () in
-  Lwt.return (div ([
+  Lwt.return (div ~a:[a_class ["header"]] ([
     a ~service:Services.main_service [pcdata "home"] ();
     pcdata " | ";
     a ~service:Services.all_service [pcdata "all"] ();
@@ -33,10 +33,12 @@ let footer =
    ]
 
 let page f a b =
+  let css = make_uri ~service:(Eliom_service.static_dir ()) ["css"; "tips.css"] in
   lwt menu = menu () in
   lwt content = f a b in
   Lwt.return
-    (html (head (title (pcdata "awesom's tips")) [])
+    (html (head (title (pcdata "awesom's tips"))
+             [css_link css ()])
        (body [h1 [pcdata "awesom's tips"];
               menu;
               content;

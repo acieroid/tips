@@ -6,3 +6,5 @@ PKG ocsigenserver
 PKG eliom.server
 PKG sqlite3
 PKG sha
+PKG ocaml-markdown
+SYN lwt

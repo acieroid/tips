@@ -23,9 +23,7 @@ let display_tip tip =
   div ~a:[a_class ["element-infos"]]
     [pcdata ("by " ^ tip.Data.author.Data.name ^ " on " ^
              (string_of_timestamp tip.Data.timestamp))];
-  (* TODO: Md.to_html *)
-  pcdata tip.Data.content;
-  br ();
+  Md.to_html tip.Data.content;
   display_tags tip.Data.tags;
 ]
 
