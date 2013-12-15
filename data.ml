@@ -63,7 +63,7 @@ let execute_query db q args f =
 
 type user = {
     name : string;
-    hash : Sha256.t option
+    hash : Bcrypt.hash_t option
   }
 
 let empty_user = {
@@ -73,7 +73,7 @@ let empty_user = {
 
 let extract_hash user =
   match user.hash with
-  | Some h -> Sha256.to_hex h
+  | Some h -> Bcrypt.string_of_hash h
   | None -> failwith "Password not specified"
 
 let add_user user =

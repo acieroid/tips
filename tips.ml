@@ -2,7 +2,6 @@ open Eliom_content.Html5.D
 open Eliom_parameter
 
 (* TODO:
-  - salt passwords or use safepass
   - admin
   - display errors in a box (login error, ...)
   - delete/edit links

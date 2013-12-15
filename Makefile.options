@@ -10,7 +10,7 @@ SERVER_FILES := $(wildcard *.eliomi *.eliom) $(wildcard *.mli *.ml)
 CLIENT_FILES := $(wildcard *.eliomi *.eliom)
 
 # OCamlfind packages for the server
-SERVER_PACKAGES := sqlite3 sha calendar markdown markdown.html
+SERVER_PACKAGES := sqlite3 calendar markdown markdown.html safepass
 # OCamlfind packages for the client
 CLIENT_PACKAGES :=
 

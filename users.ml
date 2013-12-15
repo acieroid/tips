@@ -58,7 +58,7 @@ let register_confirm () (name, (password1, password2)) =
   let err =
     if (password1 = password2) then
       try
-        let user = {Data.name=name; Data.hash=Some (Sha256.string password1)} in
+        let user = {Data.name=name; Data.hash=Some (Bcrypt.hash password1)} in
         Data.add_user user;
         None
       with
@@ -89,7 +89,7 @@ let login_body _ _ =
 
 let (>>=) = Lwt.bind
 let login_confirm () (name, password) =
-  let u = {Data.name=name; Data.hash=Some (Sha256.string password)} in
+  let u = {Data.name=name; Data.hash=Some (Bcrypt.hash password)} in
   if Data.auth_user u then
     Eliom_reference.set user (Some {u with Data.hash=None})
   else
