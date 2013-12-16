@@ -4,8 +4,6 @@ open Eliom_parameter
 (* TODO:
   - admin
   - display errors in a box (login error, ...)
-  - delete/edit links
-  - rss
 *)
 
 let menu () =
@@ -25,7 +23,7 @@ let menu () =
 
 let footer =
   div ~a:[a_class ["footer"]]
-    [a ~service:Services.rss_service [pcdata "rss"] ();
+    [a ~service:Services.atom_service [pcdata "atom"] ();
      pcdata " - ";
      Raw.a
        ~a:[a_href (Raw.uri_of_string "https://github.com/acieroid/tips")]
@@ -63,6 +61,9 @@ let tags_body _ _ =
 let show_tag_body tag _ =
   Lwt.return (div (List.map Tip.display_tip_short (Data.get_tips_with_tag tag)))
 
+let atom_body _ _ =
+  Lwt.return (Atom.body ())
+
 let todo_body _ _ =
   Lwt.return
     (p [pcdata "TODO"])
@@ -76,7 +77,6 @@ let services = [
   (Services.main_service, home_body);
   (Services.all_service, all_body);
   (Services.tags_service, tags_body);
-  (Services.rss_service, todo_body);
 ]
 
 let _ =
@@ -90,7 +90,9 @@ let _ =
     (page show_tag_body);
   Eliom_registration.Redirection.register ~service:Services.random_service
     ~options:`TemporaryRedirect
-    random_page ;
+    random_page;
+  Eliom_atom.Reg.register ~service:Services.atom_service
+    atom_body;
   (* Users *)
   Eliom_registration.Html5.register ~service:Services.register_service
     (page Users.register_body);

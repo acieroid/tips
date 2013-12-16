@@ -25,8 +25,8 @@ let delete_service =
   Eliom_service.service ~path:["delete"] ~get_params:(suffix (int "id")) ()
 
 (* Footer *)
-let rss_service =
-  Eliom_service.service ~path:["rss"] ~get_params:unit ()
+let atom_service =
+  Eliom_service.service ~path:["atom"] ~get_params:unit ()
 
 (* User-related pages *)
 let login_service =
