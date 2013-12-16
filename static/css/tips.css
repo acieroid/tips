@@ -1,0 +1,10 @@
+.error { color: #FF0000 }
+.info { }
+.header { text-align: center }
+.footer { text-align: center }
+a { color: #003399; text-decoration: none }
+a:hover { color: blue; text-decoration: underline }
+hr { color: #AACCBB; size: 25 }
+body { font-family: sans-serif }
+.element-infos { margin-left: 10px }
+.element { border: 1px dashed gray; padding: 5px }
