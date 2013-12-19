@@ -10,7 +10,8 @@ let with_db f =
 let tables = [
   "create table users (id integer primary key not null,
                        name varchar(256) unique not null,
-                       password varchar(64) not null)";
+                       password varchar(64) not null,
+                       admin integer not null)";
   "create table tips (id integer primary key not null,
                       user_id integer not null,
                       title varchar(256) not null,
@@ -78,7 +79,7 @@ let extract_hash user =
 
 let add_user user =
   let _ = with_db (fun db ->
-    execute_query db "insert into users(name, password) values (?, ?)"
+    execute_query db "insert into users(name, password, admin) values (?, ?, 0)"
       [Sqlite3.Data.TEXT user.name;
        Sqlite3.Data.TEXT (extract_hash user)]
       (fun _ -> ())) in
@@ -87,19 +88,19 @@ let add_user user =
 let auth_user user password =
   with_db (fun db ->
     let res = execute_query db
-        "select id, password from users where name = ?"
+        "select id, password, admin from users where name = ?"
         [Sqlite3.Data.TEXT user.name]
-        (fun s -> match Sqlite3.column s 0, Sqlite3.column s 1 with
-        | Sqlite3.Data.INT n, Sqlite3.Data.TEXT hash ->
+        (fun s -> match Sqlite3.column s 0, Sqlite3.column s 1, Sqlite3.column s 2 with
+        | Sqlite3.Data.INT n, Sqlite3.Data.TEXT hash, Sqlite3.Data.INT admin ->
           if Bcrypt.verify password (Bcrypt.hash_of_string hash) then
-            Some n
+            Some (n, admin <> (Int64.of_int 0))
           else
             None
         | _ -> failwith "Invalid ID type")
     in
     match res with
-    | [Some id] -> true
-    | _ -> false)
+    | [Some (id, admin)] -> true, admin
+    | _ -> false, false)
 
 type tag = string
 

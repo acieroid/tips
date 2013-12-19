@@ -90,9 +90,11 @@ let login_body _ _ =
 
 let login_confirm () (name, password) =
   let u = {Data.name=name; Data.hash=None} in
-  if Data.auth_user u password then
-    Eliom_reference.set user (Some {u with Data.hash=None})
-  else
+  let auth, admin = Data.auth_user u password in
+  if auth then begin
+    Lwt.bind (Eliom_reference.set user (Some {u with Data.hash=None}))
+      (fun _ -> Eliom_reference.set is_admin admin)
+  end else
     (* TODO: display error *)
     Lwt.return ()
 
