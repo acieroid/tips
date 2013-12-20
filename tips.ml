@@ -2,8 +2,8 @@ open Eliom_content.Html5.D
 open Eliom_parameter
 
 (* TODO:
-  - admin
   - display errors in a box (login error, ...)
+  - import data
 *)
 
 let menu () =
