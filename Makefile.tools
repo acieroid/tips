@@ -1,0 +1,14 @@
+OPTS       = -pp camlp4o -use-ocamlfind
+TAGS       = annot,debug
+LIBS       =
+PKGS       = sqlite3,calendar,markdown,markdown.html,safepass
+EXTENSION  = byte
+CFLAGS     = -w A -w -4 -w -27 -short-paths
+OCAMLBUILD = ocamlbuild $(OPTS) -tags $(TAGS) -pkgs $(PKGS) -cflags "$(CFLAGS)" -build-dir _buildtools
+
+CREATE_DB_TARGET = create_db
+
+.PHONY: all
+
+all: 
+	$(OCAMLBUILD) $(CREATE_DB_TARGET).$(EXTENSION)
