@@ -39,14 +39,14 @@ let tip_form_confirm submit_type (title, (content, tags)) =
   lwt user = Eliom_reference.get Users.user in
   Lwt.return (
     try
-      (match user with
+      begin match user with
       | Some u ->
           let tip = {
             Data.id = 0;
             Data.author = u;
-            Data.title = Data.validate_title(title);
-            Data.content = Data.validate_content(content);
-            Data.tags = Data.split_tags(tags);
+            Data.title = Data.validate_title title;
+            Data.content = Data.validate_content content;
+            Data.tags = Data.split_tags tags;
             Data.timestamp = Data.now ();
           } in
           let id, text = match submit_type with
@@ -57,7 +57,8 @@ let tip_form_confirm submit_type (title, (content, tags)) =
       | None ->
           p [pcdata "You should ";
              a ~service:Services.register_service [pcdata "register"] ();
-             pcdata " to add or edit a tip"])
+             pcdata " to add or edit a tip"]
+      end
     with
        Failure reason -> p [pcdata "Error when adding/updating the tip: ";
                             pcdata reason])

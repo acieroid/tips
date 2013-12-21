@@ -3,6 +3,8 @@ open Eliom_parameter
 
 (* TODO:
   - display errors in a box (login error, ...)
+  - persistent login
+  - improve css
 *)
 
 let menu () =
