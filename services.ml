@@ -44,3 +44,7 @@ let show_tip_service =
 
 let show_tag_service =
   Eliom_service.service ~path:["tag"] ~get_params:(suffix (string "tag")) ()
+
+(* Import *)
+let import_tip_service =
+  Eliom_service.service ~path:["import"] ~get_params:unit ()

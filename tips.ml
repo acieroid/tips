@@ -3,7 +3,6 @@ open Eliom_parameter
 
 (* TODO:
   - display errors in a box (login error, ...)
-  - import data
 *)
 
 let menu () =
@@ -108,5 +107,12 @@ let _ =
     (page Add.add_confirm);
   Eliom_registration.Html5.register ~service:Services.edit_service
     (page Add.edit_body);
+  Eliom_registration.Html5.register ~service:Add.edit_confirm_service
+    (page Add.edit_confirm);
   Eliom_registration.Html5.register ~service:Services.delete_service
     (page Add.delete_body);
+  (* To import old data *)
+  Eliom_registration.Html5.register ~service:Services.import_tip_service
+    (page Import.import_body);
+  Eliom_registration.Html5.register ~service:Import.import_confirm_service
+    (page Import.import_confirm);

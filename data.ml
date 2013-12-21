@@ -85,6 +85,19 @@ let add_user user =
       (fun _ -> ())) in
   ()
 
+let user_exists username =
+  with_db (fun db ->
+      let res = execute_query db
+          "select id from users where name = ?"
+          [Sqlite3.Data.TEXT username]
+          (fun s -> match Sqlite3.column s 0 with
+          | Sqlite3.Data.INT n -> n
+          | _ -> failwith "Invalid ID type")
+      in
+      match res with
+      | [_] -> true
+      | _ -> false)
+
 let auth_user user password =
   with_db (fun db ->
     let res = execute_query db
