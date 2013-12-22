@@ -1,0 +1,14 @@
+Tips manager
+============
+
+Dependencies: dbm, eliom, ocsigenserver, safepass, sqlite3-ocaml, calendar
+
+To run:
+  git clone http://github.com/acieroid/tips
+  opam install dbm eliom ocsigenserver safepass sqlite3-ocaml calendar
+  make
+  make test.byte # or make install && make run.byte in production
+
+Running version available at http://tips.awesom.eu
+
+Parts of the code are taken from Cumulus: https://github.com/Cumulus/Cumulus
