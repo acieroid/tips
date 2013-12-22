@@ -98,6 +98,19 @@ let user_exists username =
       | [_] -> true
       | _ -> false)
 
+let is_admin user =
+  with_db (fun db ->
+      let res = execute_query db
+          "select admin from users where name = ?"
+          [Sqlite3.Data.TEXT user.name]
+          (fun s -> match Sqlite3.column s 0 with
+             | Sqlite3.Data.INT n when n = Int64.one -> true
+             | _ -> false)
+      in
+      match res with
+      | [true] -> true
+      | _ -> false)
+
 let auth_user user password =
   with_db (fun db ->
     let res = execute_query db

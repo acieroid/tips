@@ -13,19 +13,50 @@ let register_confirm_service =
     ~post_params:(string "username" ** string "password1" ** string "password2")
     ()
 
-let user =
-  Eliom_reference.eref
-    ~scope:Eliom_common.default_session_scope
-    (None : Data.user option)
+(* Taken from Cumulus *)
+let (get_user, set_user, unset_user) =
+  let session_scope = Eliom_common.default_session_scope in
+  let eref = Eliom_reference.eref
+               ~scope:session_scope
+               ~persistent:"tips_user_v1"
+               None in
+  ((fun () -> Eliom_reference.get eref),
+   (fun user ->
+      let cookie_scope =
+        Eliom_common.cookie_scope_of_user_scope session_scope
+      in
+      Lwt.bind
+        (Eliom_state.set_persistent_data_cookie_exp_date
+           ~cookie_scope
+           (Some (Int32.to_float Int32.max_int)))
+        (fun () ->
+           Eliom_reference.set eref (Some user))),
+   (fun () -> Eliom_reference.unset eref))
 
-let is_admin =
-  Eliom_reference.eref
-    ~scope:Eliom_common.default_session_scope
-    false
+let (is_admin, set_admin, unset_admin) =
+  let do_query () = 
+    lwt user = get_user () in
+    Lwt.return (match user with
+      | Some u -> Data.is_admin u
+      | None -> false) in
+  let session_scope = Eliom_common.default_session_scope in
+  let eref = Eliom_reference.eref
+               ~scope:session_scope
+               None in
+  ((fun () ->
+    lwt v = Eliom_reference.get eref in
+    match v with
+      | None ->
+        lwt admin = do_query () in
+        lwt _ = Eliom_reference.set eref (Some admin) in
+        Lwt.return admin
+      | Some admin -> Lwt.return admin),
+   (fun admin -> Eliom_reference.set eref (Some admin)),
+   (fun () -> Eliom_reference.unset eref))
 
 let connect_box () =
-  lwt user = Eliom_reference.get user in
-  lwt admin = Eliom_reference.get is_admin in
+  lwt user = get_user () in
+  lwt admin = is_admin () in
   Lwt.return
     (match user with
     | Some u -> [pcdata ("connected as " ^
@@ -92,8 +123,8 @@ let login_confirm () (name, password) =
   let u = {Data.name=name; Data.hash=None} in
   let auth, admin = Data.auth_user u password in
   if auth then begin
-    Lwt.bind (Eliom_reference.set user (Some {u with Data.hash=None}))
-      (fun _ -> Eliom_reference.set is_admin admin)
+    Lwt.bind (set_user {u with Data.hash=None})
+      (fun _ -> set_admin admin)
   end else
     (* TODO: display error *)
     Lwt.return ()

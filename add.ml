@@ -36,7 +36,7 @@ let tip_form tip submit_type =
         ]])
 
 let tip_form_confirm submit_type (title, (content, tags)) =
-  lwt user = Eliom_reference.get Users.user in
+  lwt user = Users.get_user () in
   Lwt.return (
     try
       begin match user with
@@ -64,7 +64,7 @@ let tip_form_confirm submit_type (title, (content, tags)) =
                             pcdata reason])
 
 let edit_form tip () =
-  lwt user = Eliom_reference.get Users.user in
+  lwt user = Users.get_user () in
   Lwt.return (
     match user with
     | Some u when u.Data.name = tip.Data.author.Data.name ->
@@ -77,7 +77,7 @@ let edit_form tip () =
            pcdata "."])
 
 let add_form () =
-  lwt user = Eliom_reference.get Users.user in
+  lwt user = Users.get_user () in
   Lwt.return (
     match user with
     | Some u -> tip_form Data.empty_tip `Add ()
@@ -103,7 +103,7 @@ let edit_body id () =
 let delete_body id () =
   match Data.get_tip id with
   | Some tip ->
-      lwt user = Eliom_reference.get Users.user in
+      lwt user = Users.get_user () in
       Lwt.return
         begin match user with
         | Some u ->
