@@ -44,13 +44,13 @@ let import_confirm () (author, (title, (date, (content, tags)))) =
   lwt admin = Users.is_admin () in
   Lwt.return (
     try
-      let user = (if Data.user_exists author then
+      let user = (if Db.user_exists author then
                     { Data.name = author;
                       Data.hash = None }
                   else
                     failwith ("user '" ^ author ^ "' doesn't exist")) in
       if admin then 
-        let  tip = {
+        let tip = {
           Data.id = 0;
           Data.author = user;
           Data.title = Data.validate_title title;
@@ -58,7 +58,7 @@ let import_confirm () (author, (title, (date, (content, tags)))) =
           Data.tags = Data.split_tags tags;
           Data.timestamp = parse_date date;
         } in
-        let id = Data.add_tip tip user in
+        let id = Db.add_tip tip user in
         p [pcdata "Tip correctly imported: ";
            a ~service:Services.show_tip_service [pcdata "view"] id]
       else

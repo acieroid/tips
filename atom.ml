@@ -19,4 +19,4 @@ let body () =
                                     ~service:Services.atom_service ())
   and title = Atom_feed.plain "awesom's tips" in
   Atom_feed.feed ~id ~updated ~title
-    (List.map entry (Data.get_n_most_recent_tips 5))
+    (List.map entry (Db.get_n_most_recent_tips 5))

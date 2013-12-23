@@ -37,7 +37,7 @@ let (is_admin, set_admin, unset_admin) =
   let do_query () = 
     lwt user = get_user () in
     Lwt.return (match user with
-      | Some u -> Data.is_admin u
+      | Some u -> Db.is_admin u
       | None -> false) in
   let session_scope = Eliom_common.default_session_scope in
   let eref = Eliom_reference.eref
@@ -91,7 +91,7 @@ let register_confirm () (name, (password1, password2)) =
     if (password1 = password2) then
       try
         let user = {Data.name=name; Data.hash=Some (Bcrypt.hash password1)} in
-        Data.add_user user;
+        Db.add_user user;
         None
       with
       | e -> Some "Error when adding the user (another user with the same username probably already exists)"
@@ -121,7 +121,7 @@ let login_body _ _ =
 
 let login_confirm () (name, password) =
   let u = {Data.name=name; Data.hash=None} in
-  let auth, admin = Data.auth_user u password in
+  let auth, admin = Db.auth_user u password in
   if auth then begin
     Lwt.bind (set_user {u with Data.hash=None})
       (fun _ -> set_admin admin)

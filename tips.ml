@@ -45,22 +45,22 @@ let page f a b =
 
 let home_body _ _ =
   lwt user = Users.get_user () in
-  Lwt.return (Tip.display_tips user (Data.get_n_most_recent_tips 5))
+  Lwt.return (Tip.display_tips user (Db.get_n_most_recent_tips 5))
 
 let show_tip_body id _ =
   lwt user = Users.get_user () in
-  match Data.get_tip id with
+  match Db.get_tip id with
   | Some tip -> Lwt.return (Tip.display_tip user tip)
   | None -> Lwt.return (p [pcdata "No such tip"])
 
 let all_body _ _ =
-  Lwt.return (div (List.map Tip.display_tip_short (Data.get_all_tips ())))
+  Lwt.return (div (List.map Tip.display_tip_short (Db.get_all_tips ())))
 
 let tags_body _ _ =
-  Lwt.return (Tip.display_tags (Data.get_all_tags ()))
+  Lwt.return (Tip.display_tags (Db.get_all_tags ()))
 
 let show_tag_body tag _ =
-  Lwt.return (div (List.map Tip.display_tip_short (Data.get_tips_with_tag tag)))
+  Lwt.return (div (List.map Tip.display_tip_short (Db.get_tips_with_tag tag)))
 
 let atom_body _ _ =
   Lwt.return (Atom.body ())
@@ -72,7 +72,7 @@ let todo_body _ _ =
 let random_page _ _ =
   Lwt.return (Eliom_service.preapply
                 ~service:Services.show_tip_service
-                (Data.get_random_tip_id ()))
+                (Db.get_random_tip_id ()))
 
 let services = [
   (Services.main_service, home_body);

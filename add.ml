@@ -47,11 +47,11 @@ let tip_form_confirm submit_type (title, (content, tags)) =
             Data.title = Data.validate_title title;
             Data.content = Data.validate_content content;
             Data.tags = Data.split_tags tags;
-            Data.timestamp = Data.now ();
+            Data.timestamp = Db.now ();
           } in
           let id, text = match submit_type with
-          | `Add -> Data.add_tip tip u, "added"
-          | `Edit -> Data.update_tip tip u, "updated" in
+          | `Add -> Db.add_tip tip u, "added"
+          | `Edit -> Db.update_tip tip u, "updated" in
           p [pcdata ("Tip correctly " ^ text ^ ": ");
              a ~service:Services.show_tip_service [pcdata "view"] id]
       | None ->
@@ -96,12 +96,12 @@ let add_body () () =
   add_form ()
 
 let edit_body id () =
-  match Data.get_tip id with
+  match Db.get_tip id with
   | Some tip -> edit_form tip ()
   | None -> Lwt.return (div [p [pcdata "Tip doesn't exists"]])
 
 let delete_body id () =
-  match Data.get_tip id with
+  match Db.get_tip id with
   | Some tip ->
       lwt user = Users.get_user () in
       Lwt.return
@@ -112,7 +112,7 @@ let delete_body id () =
                 ~fallback:Services.main_service
                 ~post_params:Eliom_parameter.unit
                 ~timeout:60.
-                (fun () () -> Lwt.return (Data.delete_tip id)) in
+                (fun () () -> Lwt.return (Db.delete_tip id)) in
             div [post_form ~service:delete_confirm_service
                    (fun () ->
                      [fieldset
